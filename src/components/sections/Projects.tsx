@@ -24,11 +24,11 @@ export default function Projects() {
 			<h2 className="text-3xl font-semibold mb-10 animate-on-scroll opacity-0 translate-y-6">
 				Projects
 			</h2>
-			<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+			<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-stagger">
 				{projects.map((proj, i) => (
 					<Card
 						key={i}
-						className="border border-zinc-200 dark:border-zinc-800 animate-on-scroll opacity-0 translate-y-6"
+						className="border border-zinc-200 dark:border-zinc-800"
 					>
 						<CardHeader className="font-semibold text-lg">
 							{proj.name}

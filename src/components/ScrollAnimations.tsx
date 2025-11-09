@@ -32,8 +32,12 @@ export default function ScrollAnimations() {
 
       // create a context so animations are scoped to this component
       ctx = gsapLib.context(() => {
+        // individual targets (default behavior)
         const targets = gsapLib!.utils.toArray<HTMLElement>(".animate-on-scroll");
         targets.forEach((el: HTMLElement) => {
+          // skip elements that are inside a stagger container; they'll be handled separately
+          if (el.closest(".animate-stagger")) return;
+
           gsapLib!.fromTo(
             el,
             { autoAlpha: 0, y: 30 },
@@ -44,6 +48,30 @@ export default function ScrollAnimations() {
               ease: "power3.out",
               scrollTrigger: {
                 trigger: el,
+                start: "top 85%",
+                end: "bottom 20%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        });
+
+        // stagger containers: animate direct children with a small stagger
+        const staggerContainers = gsapLib!.utils.toArray<HTMLElement>(".animate-stagger");
+        staggerContainers.forEach((container: HTMLElement) => {
+          const children = Array.from(container.children) as HTMLElement[];
+          if (!children.length) return;
+          gsapLib!.fromTo(
+            children,
+            { autoAlpha: 0, y: 30 },
+            {
+              duration: 0.8,
+              autoAlpha: 1,
+              y: 0,
+              ease: "power3.out",
+              stagger: 0.12,
+              scrollTrigger: {
+                trigger: container,
                 start: "top 85%",
                 end: "bottom 20%",
                 toggleActions: "play none none reverse",
