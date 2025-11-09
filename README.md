@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio Website
 
-## Getting Started
+This repository contains a personal portfolio site built with Next.js + TypeScript and Tailwind CSS.
 
-First, run the development server:
+## Quick start
+
+1. Install dependencies
+
+```bash
+npm install
+```
+
+2. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 16 + React 19 (TypeScript)
+- Tailwind CSS for styling
+- GSAP scroll animations (lazy-loaded on the client) with ScrollTrigger
+  - Elements with `animate-on-scroll` will fade/slide in
+  - Containers with `animate-stagger` reveal their children with a stagger
+- Typewriter intro in the Hero
+- Hero background image support:
+  - Fallback to `/public/hero.jpg` if present
+  - Optionally set a client-side image via the in-app "Choose hero image" control (stores a data-URL in `localStorage` under the key `heroImage`).
 
-## Learn More
+## Change the hero background
 
-To learn more about Next.js, take a look at the following resources:
+Recommended: place an image in the `public/` folder (e.g. `public/hero.jpg`) and it will be used automatically.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+If you prefer the in-app chooser (client-side only):
+- Open the site, click the "Choose hero image" button in the hero, upload an image, and click "Set as hero" on the preview. This saves a data-URL to `localStorage`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+You can also set/clear the hero image from the browser console:
 
-## Deploy on Vercel
+```javascript
+// use public/hero.jpg
+localStorage.setItem('heroImage', '/hero.jpg');
+window.dispatchEvent(new CustomEvent('heroImageChanged', { detail: { src: '/hero.jpg' } }));
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+// remove override and fall back to public/hero.jpg
+localStorage.removeItem('heroImage');
+window.dispatchEvent(new CustomEvent('heroImageChanged'));
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Notes:
+- Storing images as data URLs in `localStorage` can hit browser limits (~5MB). For large images, prefer adding them to `public/`.
+- Public images are served statically and used with Next's `<Image />` optimization where possible.
+
+## Development commands
+
+- Dev server: `npm run dev`
+- Build: `npm run build`
+- Start (production): `npm run start`
+- Lint: `npm run lint`
+- Typecheck: `npx tsc --noEmit`
+
+## Developer notes
+
+- Animations are implemented in `src/components/ScrollAnimations.tsx` and are lazy-loaded so they run only in the browser.
+- The hero background logic is in `src/components/HeroBackground.tsx`. It prefers `localStorage.heroImage`, otherwise falls back to `/hero.jpg`.
+- The in-app image chooser is `src/components/ImageChooser.tsx` (client-side only).
+- To change the fade or opacity of the hero background, edit `HeroBackground.tsx` (the component uses CSS variables and a gradient that fades into `--background` so the fade respects light/dark themes).
+
+## Troubleshooting
+
+- If the hero image does not appear but `/hero.jpg` returns 200 in the Network tab, try a hard refresh (Ctrl+Shift+R) or restart the dev server. Also check `localStorage.getItem('heroImage')` to see if a bad value is set.
+- If an uploaded image fails to save via the chooser, it may be too large for `localStorage`.
