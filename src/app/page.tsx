@@ -2,10 +2,12 @@ import Hero from "@/components/sections/Hero";
 import About from "@/components/sections/About";
 import Projects from "@/components/sections/Projects";
 import Contact from "@/components/sections/Contact";
+import ScrollAnimations from "@/components/ScrollAnimations";
 
 export default function Home() {
   return (
       <main className="flex flex-col items-center w-full bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100">
+        <ScrollAnimations />
         <Hero />
         <About />
         <Projects />
