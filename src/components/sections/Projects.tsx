@@ -21,10 +21,10 @@ const projects = [
 export default function Projects() {
 	return (
 		<section id="projects" className="py-32 px-6 max-w-5xl text-center">
-			<h2 className="text-3xl font-semibold mb-10 animate-on-scroll opacity-0 translate-y-6">
+			<h2 className="text-3xl font-semibold mb-10 translate-y-6">
 				Projects
 			</h2>
-			<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-stagger">
+			<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 ">
 				{projects.map((proj, i) => (
 					<Card
 						key={i}

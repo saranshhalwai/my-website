@@ -6,7 +6,7 @@ export default function Hero() {
       <section className="relative h-screen w-full flex flex-col justify-center items-center text-center px-4">
         <HeroBackground />
         <div className="relative z-10 font-serif">
-          <h1 className="text-9xl mb-4 animate-on-scroll opacity-0 translate-y-6">
+          <h1 className="text-9xl mb-4 translate-y-6">
             <Typewriter text={"Hey, I’m"} className="inline-block font-extralight italic" />
             <br/>
             <span className="font-medium"> Saransh Halwai</span>
