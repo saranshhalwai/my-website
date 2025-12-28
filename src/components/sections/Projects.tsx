@@ -12,9 +12,9 @@ const projects = [
 		link: "https://github.com/saranshhalwai/KalpiC",
 	},
 	{
-		name: "RealTime Video",
-		desc: "An application that could map live facial expressions to any photo in real time.",
-		link: "",
+		name: "CGanga Website",
+		desc: "Made a website that could display 4000+ points on a realtime map with subsecond latency, along with user uploaded data.",
+		link: "https://github.com/saranshhalwai/CGangaFrontend",
 	},
 ];
 
