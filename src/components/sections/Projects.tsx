@@ -41,7 +41,7 @@ export default function Projects() {
 								href={proj.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-teal-500 hover:underline"
+								className="text-indigo-500 hover:underline"
 							>
 								GitHub →
 							</a>
