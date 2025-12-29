@@ -14,7 +14,7 @@ export default function GithubCalendar() {
           <img
               src={`https://ghchart.rshah.org/6366f1/${username}`}
               alt="GitHub contribution graph"
-              className="w-full opacity-90 dark:invert-[0.85]"
+              className="w-full opacity-90 dark:invert-[0.85] dark:hue-rotate-180"
           />
         </CardContent>
       </Card>
