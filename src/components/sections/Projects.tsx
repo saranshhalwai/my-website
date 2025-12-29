@@ -21,7 +21,7 @@ const projects = [
 export default function Projects() {
 	return (
 		<section id="projects" className="py-32 px-6 max-w-5xl text-center">
-			<h2 className="text-3xl font-semibold mb-10 translate-y-6">
+			<h2 className="text-6xl font-serif font-medium mb-10 translate-y-6">
 				Projects
 			</h2>
 			<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 ">
@@ -30,10 +30,10 @@ export default function Projects() {
 						key={i}
 						className="border border-zinc-200 dark:border-zinc-800"
 					>
-						<CardHeader className="font-semibold text-lg">
+						<CardHeader className="font-sans font-medium text-3xl">
 							{proj.name}
 						</CardHeader>
-						<CardContent className="text-sm text-zinc-600 dark:text-zinc-400">
+						<CardContent className="font-sans text-lg text-zinc-600 dark:text-zinc-400">
 							{proj.desc}
 						</CardContent>
 						<CardFooter>
@@ -41,7 +41,7 @@ export default function Projects() {
 								href={proj.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-indigo-500 hover:underline"
+								className="text-indigo-500 hover:underline font-mono"
 							>
 								GitHub →
 							</a>

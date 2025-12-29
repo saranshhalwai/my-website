@@ -7,16 +7,16 @@ export default function Contact() {
           id="contact"
           className="py-32 px-6 max-w-3xl mx-auto text-center"
       >
-        <h2 className="text-3xl font-semibold mb-6 translate-y-6">
+        <h2 className="text-6xl font-serif font-medium mb-6 translate-y-6">
           Get In Touch
         </h2>
 
-        <p className="text-zinc-600 dark:text-zinc-400 mb-10  translate-y-6">
+        <p className="text-zinc-600 text-lg dark:text-zinc-400 mb-10 font-sans translate-y-6">
           Always open to collaborations, discussions, or memes.
         </p>
 
         {/* Resume */}
-        <div className="mb-1 translate-y-6">
+        <div className="mb-1 text-lg translate-y-6">
           <Button
               asChild
               className="
@@ -30,17 +30,17 @@ export default function Contact() {
                 href="/Resume.pdf"
                 download
             >
-              <Download className="mr-2 h-4 w-4" />
+              <Download className="mr-2 h-4 w-4 text-lg" />
               Download Résumé
             </a>
           </Button>
         </div>
 
         {/* Socials */}
-        <div className="flex justify-center gap-6 text-sm translate-y-6">
+        <div className="flex font-sans justify-center gap-6 text-sm translate-y-6">
           <a
               href="mailto:saransh2304@gmail.com"
-              className="text-indigo-500 hover:underline"
+              className="text-indigo-500 hover:underline text-lg"
           >
             Email
           </a>
@@ -48,7 +48,7 @@ export default function Contact() {
               href="https://github.com/saranshhalwai"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-500 hover:underline"
+              className="text-indigo-500 hover:underline text-lg"
           >
             GitHub
           </a>
@@ -56,7 +56,7 @@ export default function Contact() {
               href="https://linkedin.com/in/saransh-halwai-478346171"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-500 hover:underline"
+              className="text-indigo-500 hover:underline text-lg"
           >
             LinkedIn
           </a>

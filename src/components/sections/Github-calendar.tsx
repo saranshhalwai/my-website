@@ -6,7 +6,7 @@ export default function GithubCalendar() {
   return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">
+          <CardTitle className="text-3xl font-sans font-medium">
             GitHub Activity
           </CardTitle>
         </CardHeader>
