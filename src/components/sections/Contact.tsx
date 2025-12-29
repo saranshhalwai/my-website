@@ -20,9 +20,9 @@ export default function Contact() {
           <Button
               asChild
               className="
-            bg-teal-600 text-white
-            hover:bg-teal-500
-            focus-visible:ring-2 focus-visible:ring-teal-500
+            bg-indigo-600 text-white
+            hover:bg-indigo-500
+            focus-visible:ring-2 focus-visible:ring-indigo-500
             transition p-2
           "
           >
@@ -40,7 +40,7 @@ export default function Contact() {
         <div className="flex justify-center gap-6 text-sm translate-y-6">
           <a
               href="mailto:saransh2304@gmail.com"
-              className="text-teal-500 hover:underline"
+              className="text-indigo-500 hover:underline"
           >
             Email
           </a>
@@ -48,7 +48,7 @@ export default function Contact() {
               href="https://github.com/saranshhalwai"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-teal-500 hover:underline"
+              className="text-indigo-500 hover:underline"
           >
             GitHub
           </a>
@@ -56,7 +56,7 @@ export default function Contact() {
               href="https://linkedin.com/in/saransh-halwai-478346171"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-teal-500 hover:underline"
+              className="text-indigo-500 hover:underline"
           >
             LinkedIn
           </a>
