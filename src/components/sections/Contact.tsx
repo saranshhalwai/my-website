@@ -1,25 +1,29 @@
 import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
+import ScrollAnimations from "@/components/ScrollAnimations";
 
 export default function Contact() {
   return (
+      <ScrollAnimations>
       <section
           id="contact"
           className="py-32 px-6 max-w-3xl mx-auto text-center"
       >
-        <h2 className="text-6xl font-serif font-medium mb-6 translate-y-6">
+
+        <h2 className="text-6xl font-serif font-medium mb-6 animate-on-scroll">
           Get In Touch
         </h2>
 
-        <p className="text-zinc-600 text-lg dark:text-zinc-400 mb-10 font-sans translate-y-6">
+        <p className="text-zinc-600 text-lg dark:text-zinc-400 mb-10 font-sans animate-on-scroll  ">
           Always open to collaborations, discussions, or memes.
         </p>
 
         {/* Resume */}
-        <div className="mb-1 text-lg translate-y-6">
+        <div className="mb-1 text-lg animate-on-scroll  ">
           <Button
               asChild
               className="
+            my-2
             bg-indigo-600 text-white
             hover:bg-indigo-500
             focus-visible:ring-2 focus-visible:ring-indigo-500
@@ -37,7 +41,7 @@ export default function Contact() {
         </div>
 
         {/* Socials */}
-        <div className="flex font-sans justify-center gap-6 text-sm translate-y-6">
+        <div className="flex font-sans justify-center gap-6 text-sm animate-on-scroll  ">
           <a
               href="mailto:saransh2304@gmail.com"
               className="text-indigo-500 hover:underline text-lg"
@@ -62,5 +66,6 @@ export default function Contact() {
           </a>
         </div>
       </section>
-  )
+      </ScrollAnimations>
+  );
 }
