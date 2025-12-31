@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {Noto_Sans_Mono, Noto_Sans_Display, Noto_Serif_Display} from "next/font/google";
 import "./globals.css";
 import {ThemeProvider} from "@/components/theme-provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const notoSerif = Noto_Serif_Display({
+  subsets: ["latin"],
+  variable: "--font-noto-serif",});
+
+const notoSans = Noto_Sans_Display({
+  variable: "--font-noto-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const notoMono = Noto_Sans_Mono({
+  variable: "--font-noto-mono",
   subsets: ["latin"],
 });
 
@@ -26,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${notoSans.variable} ${notoMono.variable} ${notoSerif.variable} antialiased`}
       >
       <ThemeProvider
           attribute="class"
