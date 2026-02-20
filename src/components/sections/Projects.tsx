@@ -3,18 +3,26 @@ import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 const projects = [
 	{
 		name: "IITIbot",
-		desc: "Multi-agent RAG chatbot able to answer complex queries about IIT Indore",
+		desc: "Multi-agent RAG chatbot able to answer complex queries about IIT Indore, leveraging advanced retrieval techniques for accurate and context-aware responses. Won bronze medal in IITISoC",
 		link: "https://github.com/abhinavpatel271/IITI_BOT",
+		tags: ["Python", "Pathway", "RAG", "LLM"]
+	},
+	{
+		name: "CGanga Website",
+		desc: "A high-performance interactive platform that renders 4000+ geographical points on a real-time 3D map with sub-second latency.",
+		link: "https://github.com/saranshhalwai/CGangaFrontend",
+		tags: ["React", "PostgreSQL", "FastAPI", "GIS"]
+	},
+	{
+		name: "CP Games",
+		desc: "A website to make learning and practising Competitive Programming fun and interactive.",
+		link: "https://bingo-cp-modified.vercel.app/",
+		tags: ["Next.js", "Tailwind CSS", "React"]
 	},
 	{
 		name: "Financial Analysis API",
 		desc: "An API build using FastAPI with tiering and rate-limiting, using PostgreSQL and Redis",
 		link: "https://github.com/saranshhalwai/KalpiC",
-	},
-	{
-		name: "CGanga Website",
-		desc: "Made a website that could display 4000+ points on a realtime map with subsecond latency, along with user uploaded data.",
-		link: "https://github.com/saranshhalwai/CGangaFrontend",
 	},
 ];
 
