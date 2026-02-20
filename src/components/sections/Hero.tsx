@@ -1,10 +1,15 @@
 "use client"
 
 import Typewriter from "@/components/Typewriter";
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import ShaderHeroBackground from "@/components/HeroBackground";
+import MagneticWrapper from "@/components/MagneticWrapper";
 
 export default function Hero() {
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 800], [0, 300]);
+  const opacity = useTransform(scrollY, [0, 500], [1, 0]);
+
   return (
     <section className="relative h-screen w-full overflow-hidden flex flex-col justify-center items-center text-center px-4">
 
@@ -27,8 +32,11 @@ export default function Hero() {
         />
       </div>
 
-      {/* Hero content */}
-      <div className="relative z-20 text-zinc-900 dark:text-white drop-shadow-md">
+      {/* Hero content - Parallax wrapped */}
+      <motion.div
+        style={{ y, opacity }}
+        className="relative z-20 transform-gpu text-zinc-900 dark:text-white drop-shadow-md"
+      >
         <h1 className="text-6xl md:text-9xl mb-4 leading-tight">
           <Typewriter
             text={"Hey, I’m"}
@@ -61,14 +69,18 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 1.8 }}
           className="flex items-center justify-center gap-4"
         >
-          <a href="#projects" className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium transition-colors font-sans shadow-lg shadow-indigo-500/30">
-            View Projects
-          </a>
-          <a href="#contact" className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-zinc-900/10 dark:bg-white/10 hover:bg-zinc-900/20 dark:hover:bg-white/20 text-zinc-900 dark:text-white backdrop-blur-md transition-colors font-medium font-sans border border-zinc-900/20 dark:border-white/20 shadow-lg shadow-black/5 dark:shadow-black/20">
-            Contact Me
-          </a>
+          <MagneticWrapper>
+            <a href="#projects" className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium transition-colors font-sans shadow-lg shadow-indigo-500/30">
+              View Projects
+            </a>
+          </MagneticWrapper>
+          <MagneticWrapper>
+            <a href="#contact" className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-zinc-900/10 dark:bg-white/10 hover:bg-zinc-900/20 dark:hover:bg-white/20 text-zinc-900 dark:text-white backdrop-blur-md transition-colors font-medium font-sans border border-zinc-900/20 dark:border-white/20 shadow-lg shadow-black/5 dark:shadow-black/20">
+              Contact Me
+            </a>
+          </MagneticWrapper>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }

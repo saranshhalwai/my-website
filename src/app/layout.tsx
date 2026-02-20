@@ -19,6 +19,8 @@ const notoMono = Noto_Sans_Mono({
   subsets: ["latin"],
 });
 
+import CustomCursor from "@/components/CustomCursor";
+
 export const metadata: Metadata = {
   title: "Saransh Halwai",
   description: "Welcome to my personal website!",
@@ -40,6 +42,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <CustomCursor />
           <Navbar />
           {children}
         </ThemeProvider>

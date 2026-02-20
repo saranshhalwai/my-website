@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Download, Mail, Github, Linkedin, ArrowUpRight } from "lucide-react"
 import ScrollAnimations from "@/components/ScrollAnimations";
+import MagneticWrapper from "@/components/MagneticWrapper";
 
 export default function Contact() {
   return (
@@ -22,28 +23,32 @@ export default function Contact() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-              <Button
-                asChild
-                size="lg"
-                className="bg-white text-indigo-600 hover:bg-zinc-100 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 shadow-xl shadow-indigo-900/20"
-              >
-                <a href="/Resume.pdf" download>
-                  <Download className="mr-2 h-5 w-5" />
-                  Download Résumé
-                </a>
-              </Button>
+              <MagneticWrapper>
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-white text-indigo-600 hover:bg-zinc-100 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 shadow-xl shadow-indigo-900/20"
+                >
+                  <a href="/Resume.pdf" download>
+                    <Download className="mr-2 h-5 w-5" />
+                    Download Résumé
+                  </a>
+                </Button>
+              </MagneticWrapper>
 
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="bg-transparent border-white/30 text-white hover:bg-white/10 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 backdrop-blur-sm"
-              >
-                <a href="mailto:saransh2304@gmail.com">
-                  <Mail className="mr-2 h-5 w-5" />
-                  Say Hello
-                </a>
-              </Button>
+              <MagneticWrapper>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="bg-transparent border-white/30 text-white hover:bg-white/10 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 backdrop-blur-sm"
+                >
+                  <a href="mailto:saransh2304@gmail.com">
+                    <Mail className="mr-2 h-5 w-5" />
+                    Say Hello
+                  </a>
+                </Button>
+              </MagneticWrapper>
             </div>
 
             {/* Social Links */}
