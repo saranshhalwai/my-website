@@ -5,7 +5,7 @@ import Contact from "@/components/sections/Contact";
 import GithubCalendar from "@/components/sections/Github-calendar";
 export default function Home() {
   return (
-      <main className="flex flex-col items-center w-full bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100">
+      <main className="flex flex-col items-center w-full bg-transparent text-zinc-900 dark:text-zinc-100">
 
         <Hero />
         <About />

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import {Noto_Sans_Mono, Noto_Sans_Display, Noto_Serif_Display} from "next/font/google";
+import { Noto_Sans_Mono, Noto_Sans_Display, Noto_Serif_Display } from "next/font/google";
 import "./globals.css";
-import {ThemeProvider} from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "@/components/Navbar";
 
 const notoSerif = Noto_Serif_Display({
   subsets: ["latin"],
-  variable: "--font-noto-serif",});
+  variable: "--font-noto-serif",
+});
 
 const notoSans = Noto_Sans_Display({
   variable: "--font-noto-sans",
@@ -32,14 +34,15 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} ${notoMono.variable} ${notoSerif.variable} antialiased`}
       >
-      <ThemeProvider
+        <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-      >
-        {children}
-      </ThemeProvider>
+        >
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
