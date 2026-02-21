@@ -13,6 +13,7 @@ export default function GithubCalendar() {
           <div className="h-1 w-16 bg-indigo-500 rounded-full mx-auto"></div>
         </CardHeader>
         <CardContent className="overflow-x-auto px-8 pb-8 flex justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`https://ghchart.rshah.org/6366f1/${username}`}
             alt="GitHub contribution graph"
