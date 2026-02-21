@@ -15,7 +15,7 @@ export default function Contact() {
 
           <div className="relative z-10">
             <h2 className="text-5xl md:text-7xl font-serif font-medium text-white mb-6">
-              Let's Build Something
+              Let&apos;s Build Something
             </h2>
 
             <p className="text-indigo-100 text-xl md:text-2xl font-sans mb-12 max-w-2xl mx-auto">

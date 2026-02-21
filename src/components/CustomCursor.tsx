@@ -18,7 +18,14 @@ export default function CustomCursor() {
     useEffect(() => {
         // Check if device supports hover (ignores touch devices like phones)
         if (window.matchMedia("(pointer: coarse)").matches) return;
-        setIsVisible(true);
+
+        // Use a small timeout to avoid synchronous state update warning and ensure client-side execution
+        const timer = setTimeout(() => setIsVisible(true), 0);
+        return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        if (!isVisible) return;
 
         const handleMouseMove = (e: MouseEvent) => {
             cursorX.set(e.clientX - 16); // Center the 32px cursor
@@ -47,7 +54,7 @@ export default function CustomCursor() {
             window.removeEventListener("mousemove", handleMouseMove);
             window.removeEventListener("mouseover", handleMouseOver);
         };
-    }, [cursorX, cursorY]);
+    }, [isVisible, cursorX, cursorY]);
 
     if (!isVisible) return null;
 
