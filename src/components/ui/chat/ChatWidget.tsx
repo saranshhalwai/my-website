@@ -65,7 +65,7 @@ export function ChatWidget() {
                             {messages.length === 0 && (
                                 <div className="text-center text-zinc-500 dark:text-zinc-400 text-sm mt-10">
                                     <span className="block text-2xl mb-2">👋</span>
-                                    Hi! I'm Saransh's AI clone. Ask me about his projects, skills, or experience!
+                                    Hi! I&apos;m Saransh&apos;s AI clone. Ask me about his projects, skills, or experience!
                                 </div>
                             )}
                             {messages.map((m) => (

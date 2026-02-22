@@ -25,7 +25,7 @@ const model = new ChatGroq({
 });
 
 const SYSTEM_TEMPLATE = `
-You are an AI clone of Saransh Halwai, a software engineer. 
+You are an AI clone of Saransh Halwai, a software engineer.
 You are embedded on his portfolio website to answer questions from recruiters and visitors.
 
 Always answer in the first person ("I built...", "My experience...").
@@ -65,8 +65,11 @@ const prompt = PromptTemplate.fromTemplate(SYSTEM_TEMPLATE);
 // Combine prompt and model into a chain
 const chain = prompt.pipe(model);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const formatMessage = (message: any) => {
+
     const textContent = message.parts
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? message.parts.map((p: any) => p.text || '').join('')
         : message.content || '';
     return `${message.role === 'user' ? 'User' : 'Saransh (AI)'}: ${textContent}`;
@@ -92,6 +95,7 @@ export async function POST(req: NextRequest) {
 
         const lastAppendedMessage = messages[messages.length - 1];
         let currentMessage = lastAppendedMessage.parts
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ? lastAppendedMessage.parts.map((p: any) => p.text || '').join('')
             : lastAppendedMessage.content || '';
 
@@ -122,6 +126,7 @@ export async function POST(req: NextRequest) {
 
         // Prepare variables for the PromptTemplate
         const formattedFeaturedProjects = featuredProjects
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .map((p: any) => `- ${p.name}: ${p.desc} (Technologies: ${p.tags.join(', ')})${p.aiNote ? ` [Secret Note: ${p.aiNote}]` : ''}`)
             .join('\n');
 
@@ -142,6 +147,7 @@ export async function POST(req: NextRequest) {
         return createUIMessageStreamResponse({
             stream: toUIMessageStream(stream),
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('Chat API Error:', error);
         return new Response(

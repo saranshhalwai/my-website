@@ -51,6 +51,7 @@ export const getGitHubData = cache(async (): Promise<GitHubData | null> => {
         const reposData = await reposRes.json();
 
         // Format the repos
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const topRepos = reposData.map((repo: any) => ({
             name: repo.name,
             description: repo.description,

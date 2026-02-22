@@ -12,7 +12,7 @@ export const projects = [
 		name: "CGanga Website",
 		desc: "A high-performance interactive platform that renders 4000+ geographical points on a real-time 3D map with sub-second latency.",
 		link: "https://github.com/saranshhalwai/CGangaFrontend",
-		tags: ["React", "PostgreSQL", "FastAPI", "GIS"], 
+		tags: ["React", "PostgreSQL", "FastAPI", "GIS"],
 		aiNote: "Course-backed project with external collaboration context. Emphasize GIS data modeling, database design, spatial querying efficiency, rendering optimization, and performance engineering. Avoid discussion of non-core features or organizational aspects."
 	},
 	{
