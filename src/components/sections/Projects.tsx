@@ -1,29 +1,33 @@
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 
-const projects = [
+export const projects = [
 	{
 		name: "IITIbot",
 		desc: "Multi-agent RAG chatbot able to answer complex queries about IIT Indore, leveraging advanced retrieval techniques for accurate and context-aware responses. Won bronze medal in IITISoC",
 		link: "https://github.com/abhinavpatel271/IITI_BOT",
-		tags: ["Python", "Pathway", "RAG", "LLM"]
+		tags: ["Python", "Pathway", "RAG", "LLM"],
+		aiNote: "Hackathon project built under tight time constraints. Emphasize the multi-agent architecture, retrieval pipeline design, and evaluation strategy. Focus on system design decisions and trade-offs rather than polish level or medal expectations."
 	},
 	{
 		name: "CGanga Website",
 		desc: "A high-performance interactive platform that renders 4000+ geographical points on a real-time 3D map with sub-second latency.",
 		link: "https://github.com/saranshhalwai/CGangaFrontend",
-		tags: ["React", "PostgreSQL", "FastAPI", "GIS"]
+		tags: ["React", "PostgreSQL", "FastAPI", "GIS"],
+		aiNote: "Course-backed project with external collaboration context. Emphasize GIS data modeling, database design, spatial querying efficiency, rendering optimization, and performance engineering. Avoid discussion of non-core features or organizational aspects."
 	},
 	{
 		name: "CP Games",
 		desc: "A website to make learning and practising Competitive Programming fun and interactive.",
 		link: "https://bingo-cp-modified.vercel.app/",
-		tags: ["Next.js", "Tailwind CSS", "React"]
+		tags: ["Next.js", "Tailwind CSS", "React"],
+		aiNote: "Built on an existing codebase and extended with new game modes. Highlight architectural modifications, state management decisions, game logic design, and frontend performance improvements. Emphasize original contributions rather than the base repository."
 	},
 	{
 		name: "Financial Analysis API",
-		desc: "An API built using FastAPI with multi-tier user plans, robust rate-limiting, and deep analytics. Backend powered by PostgreSQL and Redis caching.",
+		desc: "An API built using FastAPI with multi-tier user plans, robust rate-limiting, and deep analytics. Backend powered by PostgreSQL, data analysis by polars and Redis caching.",
 		link: "https://github.com/saranshhalwai/KalpiC",
-		tags: ["FastAPI", "PostgreSQL", "Redis", "Docker"]
+		tags: ["FastAPI", "PostgreSQL", "Redis", "Docker"],
+		aiNote: "Externally motivated backend project. Focus strictly on API architecture, authentication and plan-based access control, rate-limiting implementation, caching strategy, data processing pipeline, and containerization. Avoid narrative about outreach context."
 	}
 ];
 

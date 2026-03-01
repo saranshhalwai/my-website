@@ -1,74 +1,58 @@
 # Portfolio Website
 
-This repository contains a personal portfolio site built with Next.js + TypeScript and Tailwind CSS.
+This repository contains my personal portfolio site built with Next.js 16, React 19 (TypeScript), and Tailwind CSS v4.
 
-## Quick start
+## Features
 
-1. Install dependencies
+- **Next.js 16 + React 19 (App Router)**
+- **AI Chatbot Clone**: An embedded AI chatbot powered by LangChain and the Groq API (Llama 3.1 8B) that acts as an AI clone, answering questions based on my GitHub data and portfolio projects.
+- **Rate Limiting**: Integrated Upstash Redis to rate-limit the AI chatbot endpoints.
+- **Dynamic Context**: Fetches real-time profile and repository data from the GitHub API to provide the LLM with up-to-date context.
+- **Advanced Animations**: Powered by Framer Motion and GSAP (ScrollTrigger) for lazy-loaded scroll, fade, slide, and stagger animations.
+- **Modern UI Components**: Utilizes Radix UI primitives, Lucide React icons, Sonner for toasts, and Embla Carousel.
+- **Typewriter Hero Intro**
+- **Dynamic Hero Background**:
+  - Fallbacks to `/public/hero.jpg` if present.
+  - Client-side in-app image chooser (stores in `localStorage`).
 
+## Quick Start
+
+1. **Install dependencies**
 ```bash
 npm install
 ```
 
-2. Run the dev server
+2. **Environment Variables**
+Create a `.env.local` file at the root of the project with the following variables:
+```env
+GROQ_API_KEY=your_groq_api_key
+UPSTASH_REDIS_REST_URL=your_upstash_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_token
+GITHUB_TOKEN=your_github_personal_access_token
+```
 
+3. **Run the dev server**
 ```bash
 npm run dev
 ```
-
 Open http://localhost:3000 in your browser.
 
-## Features
+## Development Commands
 
-- Next.js 16 + React 19 (TypeScript)
-- Tailwind CSS for styling
-- GSAP scroll animations (lazy-loaded on the client) with ScrollTrigger
-  - Elements with `animate-on-scroll` will fade/slide in
-  - Containers with `animate-stagger` reveal their children with a stagger
-- Typewriter intro in the Hero
-- Hero background image support:
-  - Fallback to `/public/hero.jpg` if present
-  - Optionally set a client-side image via the in-app "Choose hero image" control (stores a data-URL in `localStorage` under the key `heroImage`).
+- Start Dev Server: `npm run dev`
+- Build for Production: `npm run build`
+- Start Production Server: `npm run start`
+- Run ESLint: `npm run lint`
+- Typecheck Project: `npx tsc --noEmit`
 
-## Change the hero background
+## Architecture Notes
 
-Recommended: place an image in the `public/` folder (e.g. `public/hero.jpg`) and it will be used automatically.
-
-If you prefer the in-app chooser (client-side only):
-- Open the site, click the "Choose hero image" button in the hero, upload an image, and click "Set as hero" on the preview. This saves a data-URL to `localStorage`.
-
-You can also set/clear the hero image from the browser console:
-
-```javascript
-// use public/hero.jpg
-localStorage.setItem('heroImage', '/hero.jpg');
-window.dispatchEvent(new CustomEvent('heroImageChanged', { detail: { src: '/hero.jpg' } }));
-
-// remove override and fall back to public/hero.jpg
-localStorage.removeItem('heroImage');
-window.dispatchEvent(new CustomEvent('heroImageChanged'));
-```
-
-Notes:
-- Storing images as data URLs in `localStorage` can hit browser limits (~5MB). For large images, prefer adding them to `public/`.
-- Public images are served statically and used with Next's `<Image />` optimization where possible.
-
-## Development commands
-
-- Dev server: `npm run dev`
-- Build: `npm run build`
-- Start (production): `npm run start`
-- Lint: `npm run lint`
-- Typecheck: `npx tsc --noEmit`
-
-## Developer notes
-
-- Animations are implemented in `src/components/ScrollAnimations.tsx` and are lazy-loaded so they run only in the browser.
-- The hero background logic is in `src/components/HeroBackground.tsx`. It prefers `localStorage.heroImage`, otherwise falls back to `/hero.jpg`.
-- The in-app image chooser is `src/components/ImageChooser.tsx` (client-side only).
-- To change the fade or opacity of the hero background, edit `HeroBackground.tsx` (the component uses CSS variables and a gradient that fades into `--background` so the fade respects light/dark themes).
+- **AI Chatbot**: Implemented in `src/app/api/chat/route.ts` using `@langchain/groq` and `@ai-sdk/react`. Retrieves GitHub data using `src/lib/github.ts` and leverages Upstash for ratelimiting.
+- **Animations**: Managed via Framer Motion and GSAP. `src/components/ScrollAnimations.tsx` lazy-loads GSAP scroll animations on the client.
+- **Hero Background**: Logic is located in `src/components/HeroBackground.tsx`. It prefers `localStorage.heroImage`, otherwise falls back to `/hero.jpg`.
+- **In-app Image Chooser**: Located in `src/components/ImageChooser.tsx` (client-side only).
 
 ## Troubleshooting
 
 - If the hero image does not appear but `/hero.jpg` returns 200 in the Network tab, try a hard refresh (Ctrl+Shift+R) or restart the dev server. Also check `localStorage.getItem('heroImage')` to see if a bad value is set.
-- If an uploaded image fails to save via the chooser, it may be too large for `localStorage`.
+- If an uploaded image fails to save via the chooser, it may be too large for browser limits (~5MB) in `localStorage`.
