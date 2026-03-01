@@ -35,7 +35,7 @@ export default function Hero() {
       {/* Hero content - Parallax wrapped */}
       <motion.div
         style={{ y, opacity }}
-        className="relative z-20 transform-gpu text-zinc-900 dark:text-white drop-shadow-md"
+        className="relative z-20 text-zinc-900 dark:text-white"
       >
         <h1 className="text-6xl md:text-9xl mb-4 leading-tight">
           <Typewriter
@@ -70,12 +70,12 @@ export default function Hero() {
           className="flex items-center justify-center gap-4"
         >
           <MagneticWrapper>
-            <a href="#projects" className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium transition-colors font-sans shadow-lg shadow-indigo-500/30">
+            <a href="#projects" className="inline-block px-6 py-3 md:px-8 md:py-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium transition-colors font-sans shadow-lg shadow-indigo-500/30">
               View Projects
             </a>
           </MagneticWrapper>
           <MagneticWrapper>
-            <a href="#contact" className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-zinc-900/10 dark:bg-white/10 hover:bg-zinc-900/20 dark:hover:bg-white/20 text-zinc-900 dark:text-white backdrop-blur-md transition-colors font-medium font-sans border border-zinc-900/20 dark:border-white/20 shadow-lg shadow-black/5 dark:shadow-black/20">
+            <a href="#contact" className="inline-block px-6 py-3 md:px-8 md:py-4 rounded-full bg-zinc-900/10 dark:bg-white/10 hover:bg-zinc-900/20 dark:hover:bg-white/20 text-zinc-900 dark:text-white backdrop-blur-md transition-colors font-medium font-sans border border-zinc-900/20 dark:border-white/20 shadow-lg shadow-black/5 dark:shadow-black/20">
               Contact Me
             </a>
           </MagneticWrapper>

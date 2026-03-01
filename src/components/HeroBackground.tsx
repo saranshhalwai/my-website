@@ -60,10 +60,8 @@ export default function ShaderHeroBackground() {
       const vec3 l_indigo400 = vec3(0.5, 0.57, 0.94);  // Mid indigo
       const vec3 l_indigo500 = vec3(0.388, 0.400, 0.945);
 
-      mat2 rot(float a) {
-        float s = sin(a), c = cos(a);
-        return mat2(c, -s, s, c);
-      }
+      // Optimized rotation matrix for rot(0.5)
+      const mat2 m = mat2(0.87758, -0.47942, 0.47942, 0.87758);
 
       float hash(vec2 p) {
         return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -84,10 +82,12 @@ export default function ShaderHeroBackground() {
         float v = 0.0;
         float a = 0.5;
         vec2 shift = vec2(100.0);
-        for (int i = 0; i < 7; i++) {
-          float n = noise(p + u_time * speed);
+        float t = u_time * speed;
+        // Reduced from 7 to 4 octaves for significantly better performance
+        for (int i = 0; i < 4; i++) {
+          float n = noise(p + t);
           v += a * (1.0 - abs(n * 2.0 - 1.0));
-          p = rot(0.5) * p * 2.2 + shift;
+          p = m * p * 2.2 + shift;
           a *= 0.5;
         }
         return v;
@@ -184,9 +184,13 @@ export default function ShaderHeroBackground() {
     const lightModeLoc = gl.getUniformLocation(program, "u_lightMode");
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio, 2.0);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
+      // Limit DPR to 1.5 for background shader performance
+      // Since it's blurry, high resolutions are unnecessary and expensive
+      const dpr = Math.min(window.devicePixelRatio, 1.5);
+      const width = canvas.clientWidth || window.innerWidth;
+      const height = canvas.clientHeight || window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
 
@@ -237,11 +241,12 @@ export default function ShaderHeroBackground() {
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         zIndex: -1, // Ensure this is lower than your content's z-index
         pointerEvents: 'none',
-        background: 'transparent'
+        background: 'transparent',
+        transform: 'translateZ(0)', // Force hardware acceleration to prevent visual artifacts
       }}
     />
   );
