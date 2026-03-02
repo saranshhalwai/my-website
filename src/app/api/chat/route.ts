@@ -17,6 +17,14 @@ const ratelimit = new Ratelimit({
     analytics: true,
 });
 
+// Create a global ratelimiter, that allows 50 requests per day across all users
+const globalRatelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.fixedWindow(50, '1 d'),
+    analytics: true,
+    prefix: '@upstash/ratelimit/global_ai_chat'
+});
+
 // Build the LangChain model
 // We use llama-3.1-8b-instant for blazing fast responses
 const model = new ChatGroq({
@@ -77,6 +85,13 @@ const formatMessage = (message: any) => {
 
 export async function POST(req: NextRequest) {
     try {
+        // Global Daily Rate Limiting
+        const { success: globalSuccess } = await globalRatelimit.limit('global_daily_limit');
+        if (!globalSuccess) {
+            console.warn('[API/Chat] Global daily rate limit exceeded');
+            return new Response('Daily usage limit reached. Please try again tomorrow.', { status: 429 });
+        }
+
         // Rate Limiting (req.ip might be omitted depending on the hosting provider)
         const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous';
         const { success } = await ratelimit.limit(ip);
