@@ -99,17 +99,21 @@ export default function ShaderHeroBackground() {
         vec2 p = (uv - 0.5) * 2.0;
         p.x *= aspect;
         
+        // Save screen coordinate for accurate mouse tracking
+        vec2 screenP = p;
+        
         // Parallax
         p.y += u_scroll * 0.4;
 
         vec2 m = (u_mouse - 0.5) * 2.0;
         m.x *= aspect;
 
-        float dist = distance(p, m);
+        // Calculate distance using unshifted screen coordinate
+        float dist = distance(screenP, m);
 
         float ripple = sin(dist * 15.0 - u_time * 4.0) * 0.04 * u_click;
         float mouseWarp = smoothstep(1.2, 0.0, dist) * 0.2;
-        vec2 warpedP = p + (p - m) * (mouseWarp + ripple);
+        vec2 warpedP = p + (screenP - m) * (mouseWarp + ripple);
 
         float v1 = ridgedFBM(warpedP * 1.2, 0.1);
         float v2 = ridgedFBM(warpedP * 2.5 + v1, 0.2);
@@ -137,9 +141,10 @@ export default function ShaderHeroBackground() {
           color += d_indigo500 * pow(v3, 6.0) * 3.0;
 
           // Dark Flare with Chromatic Aberration
-          float flareR = 0.025 / (distance(p, m) + 0.05);
-          float flareG = 0.025 / (distance(p, m + 0.01) + 0.05);
-          float flareB = 0.025 / (distance(p, m - 0.01) + 0.05);
+          // Use screenP to accurately follow mouse
+          float flareR = 0.025 / (distance(screenP, m) + 0.05);
+          float flareG = 0.025 / (distance(screenP, m + 0.01) + 0.05);
+          float flareB = 0.025 / (distance(screenP, m - 0.01) + 0.05);
           vec3 flare = vec3(flareR, flareG, flareB) * d_indigo300;
           
           color += flare * (0.6 + v3 * 0.4);
@@ -187,10 +192,8 @@ export default function ShaderHeroBackground() {
       // Limit DPR to 1.5 for background shader performance
       // Since it's blurry, high resolutions are unnecessary and expensive
       const dpr = Math.min(window.devicePixelRatio, 1.5);
-      const width = canvas.clientWidth || window.innerWidth;
-      const height = canvas.clientHeight || window.innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
 
