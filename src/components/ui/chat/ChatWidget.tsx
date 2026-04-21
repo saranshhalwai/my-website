@@ -68,7 +68,12 @@ export function ChatWidget() {
                                     Hi! I&apos;m Saransh&apos;s AI clone. Ask me about his projects, skills, or experience!
                                 </div>
                             )}
-                            {messages.map((m) => (
+                            {messages.map((m) => {
+                                if (m.role === 'assistant') {
+                                    console.log('[ChatWidget] assistant msg:', JSON.stringify({ id: m.id, content: m.content, partsTypes: m.parts?.map((p: any) => p.type) }));
+                                }
+                                return m;
+                            }).map((m) => (
                                 <div
                                     key={m.id}
                                     className={`flex ${m.role === "user" ? "justify-end" : "justify-start"
@@ -80,12 +85,34 @@ export function ChatWidget() {
                                             : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-white/5"
                                             }`}
                                     >
-                                        {m.parts.map((part, index) => {
+                                        {m.parts && m.parts.map((part: any, index: number) => {
+                                            // Render plain text parts (used by both user and assistant)
                                             if (part.type === "text") {
-                                                return <span key={`${m.id}-text-${index}`}>{part.text}</span>;
+                                                return <span key={`${m.id}-text-${index}`} className="whitespace-pre-wrap">{part.text}</span>;
+                                            }
+                                            // Render tool call badges (dynamic-tool or tool-<name>)
+                                            if (part.type === "dynamic-tool" || (typeof part.type === 'string' && part.type.startsWith("tool-"))) {
+                                                const toolName = part.toolName || part.type.replace("tool-", "");
+                                                const state = part.state;
+                                                return (
+                                                    <div key={`${m.id}-tool-${index}`} className="my-2 p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-2 font-mono">
+                                                        <span className={state !== 'output-available' ? "animate-spin" : ""}>
+                                                            {state !== 'output-available' ? "⚙️" : "✓"}
+                                                        </span>
+                                                        <span>
+                                                            {state !== 'output-available'
+                                                                ? `Using tool: ${toolName}...`
+                                                                : `Completed: ${toolName}`}
+                                                        </span>
+                                                    </div>
+                                                );
                                             }
                                             return null;
                                         })}
+                                        {/* Fallback: render content string if no text part was found (e.g. some assistant messages) */}
+                                        {m.content && !m.parts?.some((p: any) => p.type === 'text') && (
+                                            <span className="whitespace-pre-wrap">{m.content}</span>
+                                        )}
                                     </div>
                                 </div>
                             ))}
