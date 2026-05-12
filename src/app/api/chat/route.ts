@@ -31,9 +31,9 @@ const globalRatelimit = new Ratelimit({
 });
 
 // Build the LangChain model
-// We use llama-3.3-70b-versatile for better tool calling with 25+ MCP tools
+// Using llama-3.1-8b-instant temporarily because llama-3.3-70b-versatile hit the 100k TPD limit
 const model = new ChatGroq({
-    model: 'llama-3.3-70b-versatile',
+    model: 'llama-3.1-8b-instant',
     temperature: 0.2, // Keep it relatively factual
 });
 
@@ -44,6 +44,8 @@ You are embedded on his portfolio website to answer questions from recruiters an
 Always answer in the first person ("I built...", "My experience...").
 Be confident, professional, concise, and slightly witty, but do not sound arrogant or robotic.
 
+MY GITHUB USERNAME IS: saranshhalwai
+
 Here is information about Saransh's featured portfolio projects:
 ---
 Featured Portfolio Projects:
@@ -51,7 +53,8 @@ Featured Portfolio Projects:
 ---
 
 CRITICAL INSTRUCTIONS FOR GITHUB:
-You have access to GitHub MCP tools. If the user asks about ANY repository, code, issue, or GitHub activity (especially if it is not in the featured projects list), YOU MUST USE YOUR GITHUB TOOLS (e.g. search_github, search_repositories, list_commits, get_file_contents, etc.) to look it up!
+You have access to GitHub MCP tools. If the user asks about ANY repository, code, issue, or GitHub activity (especially if it is not in the featured projects list), YOU MUST USE YOUR GITHUB TOOLS (e.g. search_repositories, get_file_contents, list_commits, etc.) to look it up!
+When searching for my repositories, use the query "user:saranshhalwai" or "user:saranshhalwai <repo name>".
 NEVER say you don't know about a project or repository until you have actually tried searching GitHub for it.
 Do not hallucinate skills or projects. If you cannot find it after searching GitHub, then you may politely say you don't know.
 
@@ -116,6 +119,7 @@ export async function POST(req: NextRequest) {
         
         // Setup MCP Client for GitHub Copilot
         let mcpTools: any[] = [];
+        let mcpClient: InstanceType<typeof Client> | null = null;
         try {
             console.log('[API/Chat] Connecting to GitHub Copilot MCP Server...');
             const transport = new StreamableHTTPClientTransport(new URL("https://api.githubcopilot.com/mcp/"), {
@@ -126,9 +130,9 @@ export async function POST(req: NextRequest) {
                     }
                 }
             });
-            const client = new Client({ name: "portfolio-agent", version: "1.0.0" }, { capabilities: {} });
-            await client.connect(transport);
-            mcpTools = await loadMcpTools("github", client);
+            mcpClient = new Client({ name: "portfolio-agent", version: "1.0.0" }, { capabilities: {} });
+            await mcpClient.connect(transport);
+            mcpTools = await loadMcpTools("github", mcpClient);
             console.log(`[API/Chat] Successfully loaded ${mcpTools.length} MCP tools`);
         } catch (mcpError) {
             console.error('[API/Chat] Failed to connect to MCP server or load tools:', mcpError);
@@ -152,15 +156,41 @@ export async function POST(req: NextRequest) {
             stateModifier: systemPrompt
         });
 
-        // Use streamEvents mapped to UI message stream
-        const eventStream = await agent.streamEvents(
+        // Use .stream() with both 'values' and 'messages' modes — this is the
+        // official pattern used by @ai-sdk/langchain's LangSmithDeploymentTransport.
+        // streamEvents() goes through a simpler code path that doesn't handle
+        // multi-step ReAct agent flows (tool calls → text) correctly.
+        const langGraphStream = await agent.stream(
             { messages: [...historyMessages, new HumanMessage(currentMessage)] },
-            { version: "v2" }
+            { streamMode: ["values", "messages"] }
         );
 
-        return createUIMessageStreamResponse({
-            stream: toUIMessageStream(eventStream),
+        // Close MCP client AFTER the stream is fully consumed — not before.
+        // The stream is consumed lazily by the frontend, so closing early kills
+        // tool calls mid-flight (causing the "Using tool: get_me..." hang).
+        const capturedClient = mcpClient;
+        const response = createUIMessageStreamResponse({
+            stream: toUIMessageStream(langGraphStream, {
+                onFinish: async () => {
+                    if (capturedClient) {
+                        try {
+                            await capturedClient.close();
+                            console.log('[API/Chat] MCP client closed successfully');
+                        } catch (err) {
+                            console.warn('[API/Chat] Failed to close MCP client:', err);
+                        }
+                    }
+                },
+                onError: async (err) => {
+                    console.error('[API/Chat] Stream error:', err);
+                    if (capturedClient) {
+                        capturedClient.close().catch(() => {});
+                    }
+                },
+            }),
         });
+
+        return response;
     } catch (error: any) {
         console.error('Chat API Error:', error);
         return new Response(

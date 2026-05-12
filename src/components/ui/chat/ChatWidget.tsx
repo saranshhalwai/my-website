@@ -11,14 +11,18 @@ export function ChatWidget() {
     const [input, setInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const { messages, sendMessage } = useChat({
+    const { messages, sendMessage, status, error } = useChat({
         transport: new DefaultChatTransport({
             api: "/api/chat",
         }),
     });
 
-    // Check if the AI is currently generating a response
-    const isLoading = messages.length > 0 && messages[messages.length - 1].role === "user";
+    if (error) {
+        console.error('[ChatWidget] useChat error:', error);
+    }
+
+    // Check if the AI is currently generating a response (use official status field)
+    const isLoading = status === 'streaming' || status === 'submitted';
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
@@ -69,9 +73,7 @@ export function ChatWidget() {
                                 </div>
                             )}
                             {messages.map((m) => {
-                                if (m.role === 'assistant') {
-                                    console.log('[ChatWidget] assistant msg:', JSON.stringify({ id: m.id, content: m.content, partsTypes: m.parts?.map((p: any) => p.type) }));
-                                }
+                                console.log('[ChatWidget] msg:', JSON.stringify({ id: m.id, role: m.role, content: m.content, parts: m.parts }));
                                 return m;
                             }).map((m) => (
                                 <div
