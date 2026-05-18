@@ -23,14 +23,14 @@ import CustomCursor from "@/components/CustomCursor";
 import { ChatWidget } from "@/components/ui/chat/ChatWidget";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://saranshhalwai.vercel.app"),
+  metadataBase: new URL("https://saranshhalwai.me"),
   title: "Saransh Halwai | Portfolio",
   description: "Portfolio of Saransh Halwai, Software Developer. Welcome to my personal website!",
   keywords: ["Saransh Halwai", "Software Developer", "Portfolio", "Developer", "Engineer"],
   openGraph: {
     title: "Saransh Halwai | Portfolio",
     description: "Portfolio of Saransh Halwai, Software Developer. Welcome to my personal website!",
-    url: "https://saranshhalwai.vercel.app",
+    url: "https://saranshhalwai.me",
     siteName: "Saransh Halwai",
     locale: "en_US",
     type: "website",
