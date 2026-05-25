@@ -72,10 +72,7 @@ export function ChatWidget() {
                                     Hi! I&apos;m Saransh&apos;s AI clone. Ask me about his projects, skills, or experience!
                                 </div>
                             )}
-                            {messages.map((m) => {
-                                console.log('[ChatWidget] msg:', JSON.stringify({ id: m.id, role: m.role, content: m.content, parts: m.parts }));
-                                return m;
-                            }).map((m) => (
+                            {messages.map((m) => (
                                 <div
                                     key={m.id}
                                     className={`flex ${m.role === "user" ? "justify-end" : "justify-start"
@@ -111,10 +108,7 @@ export function ChatWidget() {
                                             }
                                             return null;
                                         })}
-                                        {/* Fallback: render content string if no text part was found (e.g. some assistant messages) */}
-                                        {m.content && !m.parts?.some((p: any) => p.type === 'text') && (
-                                            <span className="whitespace-pre-wrap">{m.content}</span>
-                                        )}
+
                                     </div>
                                 </div>
                             ))}
@@ -137,8 +131,7 @@ export function ChatWidget() {
                                     e.preventDefault();
                                     if (!input.trim()) return;
                                     sendMessage({
-                                        role: "user",
-                                        parts: [{ type: "text", text: input }],
+                                        text: input,
                                     });
                                     setInput("");
                                 }}
