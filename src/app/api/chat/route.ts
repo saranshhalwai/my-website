@@ -145,8 +145,13 @@ export async function POST(req: NextRequest) {
 
         // Prepare variables for the PromptTemplate
         const formattedFeaturedProjects = featuredProjects
-            .map((p: any) => `- ${p.name}: ${p.desc} (Technologies: ${p.tags.join(', ')})${p.aiNote ? ` [Secret Note: ${p.aiNote}]` : ''}`)
-            .join('\n');
+            .map((p: any) => {
+                const detailsText = p.details && p.details.length > 0 
+                    ? `\n  Technical Details:\n  ${p.details.map((d: string) => `* ${d}`).join('\n  ')}` 
+                    : '';
+                return `- ${p.name}: ${p.desc}${detailsText}\n  Technologies: ${p.tags.join(', ')}${p.aiNote ? ` [Secret Note: ${p.aiNote}]` : ''}`;
+            })
+            .join('\n\n');
 
         const systemPrompt = await PromptTemplate.fromTemplate(SYSTEM_TEMPLATE).format({
             featured_projects_text: formattedFeaturedProjects,
