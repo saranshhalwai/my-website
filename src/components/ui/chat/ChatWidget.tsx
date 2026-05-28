@@ -11,14 +11,18 @@ export function ChatWidget() {
     const [input, setInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const { messages, sendMessage } = useChat({
+    const { messages, sendMessage, status, error } = useChat({
         transport: new DefaultChatTransport({
             api: "/api/chat",
         }),
     });
 
-    // Check if the AI is currently generating a response
-    const isLoading = messages.length > 0 && messages[messages.length - 1].role === "user";
+    if (error) {
+        console.error('[ChatWidget] useChat error:', error);
+    }
+
+    // Check if the AI is currently generating a response (use official status field)
+    const isLoading = status === 'streaming' || status === 'submitted';
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
@@ -80,12 +84,31 @@ export function ChatWidget() {
                                             : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-white/5"
                                             }`}
                                     >
-                                        {m.parts.map((part, index) => {
+                                        {m.parts && m.parts.map((part: any, index: number) => {
+                                            // Render plain text parts (used by both user and assistant)
                                             if (part.type === "text") {
-                                                return <span key={`${m.id}-text-${index}`}>{part.text}</span>;
+                                                return <span key={`${m.id}-text-${index}`} className="whitespace-pre-wrap">{part.text}</span>;
+                                            }
+                                            // Render tool call badges (dynamic-tool or tool-<name>)
+                                            if (part.type === "dynamic-tool" || (typeof part.type === 'string' && part.type.startsWith("tool-"))) {
+                                                const toolName = part.toolName || part.type.replace("tool-", "");
+                                                const state = part.state;
+                                                return (
+                                                    <div key={`${m.id}-tool-${index}`} className="my-2 p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-2 font-mono">
+                                                        <span className={state !== 'output-available' ? "animate-spin" : ""}>
+                                                            {state !== 'output-available' ? "⚙️" : "✓"}
+                                                        </span>
+                                                        <span>
+                                                            {state !== 'output-available'
+                                                                ? `Using tool: ${toolName}...`
+                                                                : `Completed: ${toolName}`}
+                                                        </span>
+                                                    </div>
+                                                );
                                             }
                                             return null;
                                         })}
+
                                     </div>
                                 </div>
                             ))}
@@ -108,8 +131,7 @@ export function ChatWidget() {
                                     e.preventDefault();
                                     if (!input.trim()) return;
                                     sendMessage({
-                                        role: "user",
-                                        parts: [{ type: "text", text: input }],
+                                        text: input,
                                     });
                                     setInput("");
                                 }}
