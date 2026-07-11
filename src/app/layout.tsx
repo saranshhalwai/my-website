@@ -20,7 +20,6 @@ const notoMono = Noto_Sans_Mono({
 });
 
 import CustomCursor from "@/components/CustomCursor";
-import { ChatWidget } from "@/components/ui/chat/ChatWidget";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://saranshhalwai.vercel.app"),
@@ -71,7 +70,6 @@ export default function RootLayout({
           <CustomCursor />
           <Navbar />
           {children}
-          <ChatWidget />
         </ThemeProvider>
       </body>
     </html>
