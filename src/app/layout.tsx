@@ -22,7 +22,7 @@ const notoMono = Noto_Sans_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://saranshhalwai.vercel.app"),
+  metadataBase: new URL("https://saranshhalwai.me"),
   title: "Saransh Halwai | Portfolio & Systems Enthusiast",
   description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
   keywords: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Saransh Halwai | Portfolio",
     description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
-    url: "https://saranshhalwai.vercel.app",
+    url: "https://saranshhalwai.me",
     siteName: "Saransh Halwai",
     locale: "en_US",
     type: "website",
