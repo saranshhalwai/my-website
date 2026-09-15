@@ -1,14 +1,51 @@
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
+import { ExternalLink, Github } from "lucide-react";
 
 export interface Project {
 	name: string;
 	desc: string;
-	link: string;
+	link?: string;
+	demo?: string;
 	tags: string[];
 	details: string[];
 }
 
 export const projects: Project[] = [
+	{
+		name: "OpenLeaf",
+		desc: "High-concurrency collaborative LaTeX editor built as an open alternative to Overleaf with on-the-fly PDF compilation.",
+		demo: "https://openleaf.saranshhalwai.me",
+		tags: ["Cloudflare Workers", "Google Cloud", "LaTeX Engine", "React", "TypeScript", "Tailwind CSS"],
+		details: [
+			"Engineered an independent Overleaf alternative to overcome free-tier platform restrictions and enable unrestricted collaborative document authoring.",
+			"Architected a serverless frontend edge-deployed on Cloudflare Workers, interfacing with a containerized Google Cloud backend engine executing secure LaTeX PDF compilation routines on demand.",
+			"Designed real-time compilation pipelines optimized for sub-second document previews, with multi-user collaborative synchronization currently in active development."
+		]
+	},
+	{
+		name: "CP-Games",
+		desc: "A real-time, multiplayer gaming arena and competitive programming strategy wrapper layered on top of the Codeforces API.",
+		link: "https://github.com/legendxanurag/CP-Games",
+		demo: "https://cp-games.vercel.app",
+		tags: ["Next.js", "React 19", "Pusher WebSockets", "Prisma ORM", "Neon PostgreSQL", "Framer Motion", "Radix UI"],
+		details: [
+			"Architected a real-time multiplayer competitive programming platform by integrating the Codeforces API, expanding an open-source engine with complex game modes (Ticket to Ride, Tug of War).",
+			"Synchronized multiplayer game state and board mutations in real-time by implementing full-duplex WebSocket connections via Pusher within a Next.js frontend.",
+			"Designed a highly normalized relational database schema using Prisma ORM and deployed a serverless PostgreSQL (Neon) database instance to manage concurrent user sessions, game progression metrics, and API polling rate constraints."
+		]
+	},
+	{
+		name: "BeatChain",
+		desc: "Interoperable, intermediary-free music streaming platform powered by on-chain micro-payments and decentralized content routing.",
+		link: "https://github.com/saranshhalwai/Decentralised_music_streaming",
+		demo: "https://decentralised-music-streaming.vercel.app",
+		tags: ["Solidity", "Hardhat", "Ethers.js", "OpenZeppelin", "Next.js", "Pinata IPFS", "Tailwind CSS"],
+		details: [
+			"Architected a full-stack Web3 music streaming platform on the Ethereum Sepolia testnet, using Next.js with ethers.js and Pinata IPFS for immutable, decentralized storage of audio assets and metadata.",
+			"Engineered a custom suite of OpenZeppelin-secured Solidity smart contracts to coordinate instant ETH tips, ERC-721 collectibles embedded with ERC-2981 standard royalty parameters, and an ERC-20 tokenized governance network for decentralized copyright dispute claims.",
+			"Optimized EVM compilation and gas efficiency by replacing standard string require checks with custom error structures (saving ~8,000 gas on deployment) and utilizing low-level calldata pointers to minimize expensive memory allocation routines during track ingestion."
+		]
+	},
 	{
 		name: "Smart Supply Chain Optimisation",
 		desc: "Production-grade logistics routing and vehicle assignment engine driven by Graph ML and Reinforcement Learning.",
@@ -33,17 +70,6 @@ export const projects: Project[] = [
 		]
 	},
 	{
-		name: "CP-Games",
-		desc: "A real-time, multiplayer gaming arena and competitive programming strategy wrapper layered on top of the Codeforces API.",
-		link: "https://github.com/legendxanurag/CP-Games",
-		tags: ["Next.js", "React 19", "Pusher WebSockets", "Prisma ORM", "Neon PostgreSQL", "Framer Motion", "Radix UI"],
-		details: [
-			"Architected a real-time multiplayer competitive programming platform by integrating the Codeforces API, expanding an open-source engine with complex game modes (Ticket to Ride, Tug of War).",
-			"Synchronized multiplayer game state and board mutations in real-time by implementing full-duplex WebSocket connections via Pusher within a Next.js frontend.",
-			"Designed a highly normalized relational database schema using Prisma ORM and deployed a serverless PostgreSQL (Neon) database instance to manage concurrent user sessions, game progression metrics, and API polling rate constraints."
-		]
-	},
-	{
 		name: "CGanga Data Visualiser",
 		desc: "Enterprise-grade full-stack Geographic Information System (GIS) built for state-wide groundwater telemetry mapping.",
 		link: "https://github.com/saranshhalwai/Cgangafrontend",
@@ -52,17 +78,6 @@ export const projects: Project[] = [
 			"Engineered a full-stack Geographic Information System (GIS) to visualize state-wide groundwater telemetry data and complex river basin topologies.",
 			"Developed a high-performance React/TypeScript mapping interface utilizing Leaflet.js, optimizing the rendering of extensive GeoJSON FeatureCollections (continuous LineStrings and multi-vertex Polygons) with dynamic layer toggling.",
 			"Implemented a secure JWT-based Role-Based Access Control (RBAC) mechanism protecting admin-only FastAPI endpoints that process the ingestion and coordinate transformation of zipped Shapefiles into EPSG:4326 PostGIS database tables."
-		]
-	},
-	{
-		name: "BeatChain",
-		desc: "Interoperable, intermediary-free music streaming platform powered by on-chain micro-payments and decentralized content routing.",
-		link: "https://github.com/saranshhalwai/Decentralised_music_streaming",
-		tags: ["Solidity", "Hardhat", "Ethers.js", "OpenZeppelin", "Next.js", "Pinata IPFS", "Tailwind CSS"],
-		details: [
-			"Architected a full-stack Web3 music streaming platform on the Ethereum Sepolia testnet, using Next.js with ethers.js and Pinata IPFS for immutable, decentralized storage of audio assets and metadata.",
-			"Engineered a custom suite of OpenZeppelin-secured Solidity smart contracts to coordinate instant ETH tips, ERC-721 collectibles embedded with ERC-2981 standard royalty parameters, and an ERC-20 tokenized governance network for decentralized copyright dispute claims.",
-			"Optimized EVM compilation and gas efficiency by replacing standard string require checks with custom error structures (saving ~8,000 gas on deployment) and utilizing low-level calldata pointers to minimize expensive memory allocation routines during track ingestion."
 		]
 	}
 ];
@@ -112,16 +127,29 @@ export default function Projects() {
 							</div>
 						</CardContent>
 
-						<CardFooter className="pb-8">
-							<a
-								href={proj.link}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold font-sans text-sm group/link transition-colors"
-							>
-								View Project
-								<span className="ml-2 group-hover/link:translate-x-2 transition-transform">→</span>
-							</a>
+						<CardFooter className="pb-8 pt-4 flex flex-wrap items-center gap-3">
+							{proj.demo && (
+								<a
+									href={proj.demo}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold font-sans text-xs shadow-md shadow-indigo-500/25 transition-all hover:scale-105"
+								>
+									<ExternalLink size={14} />
+									<span>Live Demo</span>
+								</a>
+							)}
+							{proj.link && (
+								<a
+									href={proj.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-100/90 hover:bg-zinc-200/90 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-200 font-medium font-sans text-xs transition-colors"
+								>
+									<Github size={14} />
+									<span>Source Code</span>
+								</a>
+							)}
 						</CardFooter>
 					</Card>
 				))}

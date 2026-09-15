@@ -3,6 +3,8 @@ import { Noto_Sans_Mono, Noto_Sans_Display, Noto_Serif_Display } from "next/font
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
+import CustomCursor from "@/components/CustomCursor";
+import { Toaster } from "@/components/ui/sonner";
 
 const notoSerif = Noto_Serif_Display({
   subsets: ["latin"],
@@ -19,20 +21,32 @@ const notoMono = Noto_Sans_Mono({
   subsets: ["latin"],
 });
 
-import CustomCursor from "@/components/CustomCursor";
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://saranshhalwai.me"),
-  title: "Saransh Halwai | Portfolio",
-  description: "Portfolio of Saransh Halwai, Software Developer. Welcome to my personal website!",
-  keywords: ["Saransh Halwai", "Software Developer", "Portfolio", "Developer", "Engineer"],
+  title: "Saransh Halwai | Portfolio & Systems Enthusiast",
+  description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
+  keywords: [
+    "Saransh Halwai",
+    "Software Developer",
+    "IIT Indore",
+    "Samsung R&D",
+    "SRIB",
+    "Portfolio",
+    "Systems Design",
+    "AI Engineer"
+  ],
   openGraph: {
     title: "Saransh Halwai | Portfolio",
-    description: "Portfolio of Saransh Halwai, Software Developer. Welcome to my personal website!",
+    description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
     url: "https://saranshhalwai.me",
     siteName: "Saransh Halwai",
     locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Saransh Halwai | Portfolio",
+    description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
   },
   robots: {
     index: true,
@@ -50,6 +64,27 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Saransh Halwai",
+  url: "https://saranshhalwai.vercel.app",
+  jobTitle: "Software Developer & Incoming Developer Intern",
+  worksFor: {
+    "@type": "Organization",
+    name: "Samsung R&D Institute India (SRIB)",
+  },
+  alumniOf: {
+    "@type": "EducationalOrganization",
+    name: "Indian Institute of Technology Indore",
+  },
+  sameAs: [
+    "https://github.com/saranshhalwai",
+    "https://linkedin.com/in/saransh-halwai-478346171",
+    "https://leetcode.com/u/saransh6/",
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,6 +92,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${notoSans.variable} ${notoMono.variable} ${notoSerif.variable} antialiased`}
         suppressHydrationWarning
@@ -70,6 +111,7 @@ export default function RootLayout({
           <CustomCursor />
           <Navbar />
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
