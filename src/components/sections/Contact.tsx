@@ -1,9 +1,24 @@
-import { Button } from "@/components/ui/button"
-import { Download, Mail, Github, Linkedin, ArrowUpRight } from "lucide-react"
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Download, Mail, Github, Linkedin, ArrowUpRight, Copy, Check, Code2 } from "lucide-react";
 import ScrollAnimations from "@/components/ScrollAnimations";
 import MagneticWrapper from "@/components/MagneticWrapper";
+import { toast } from "sonner";
 
 export default function Contact() {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText("saransh2304@gmail.com");
+    setCopied(true);
+    toast.success("Email copied to clipboard!", {
+      description: "saransh2304@gmail.com",
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <ScrollAnimations>
       <section id="contact" className="py-32 px-6 max-w-7xl mx-auto">
@@ -22,12 +37,12 @@ export default function Contact() {
               Always open to collaborations, system design discussions, or sharing memes.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-16">
               <MagneticWrapper>
                 <Button
                   asChild
                   size="lg"
-                  className="bg-white text-indigo-600 hover:bg-zinc-100 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 shadow-xl shadow-indigo-900/20"
+                  className="bg-white text-indigo-600 hover:bg-zinc-100 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 shadow-xl shadow-indigo-900/20 cursor-pointer"
                 >
                   <a href="/Resume.pdf" download>
                     <Download className="mr-2 h-5 w-5" />
@@ -41,12 +56,33 @@ export default function Contact() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="bg-transparent border-white/30 text-white hover:bg-white/10 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 backdrop-blur-sm"
+                  className="bg-transparent border-white/30 text-white hover:bg-white/10 px-8 py-6 rounded-full text-lg font-semibold transition-all hover:scale-105 backdrop-blur-sm cursor-pointer"
                 >
                   <a href="mailto:saransh2304@gmail.com">
                     <Mail className="mr-2 h-5 w-5" />
                     Say Hello
                   </a>
+                </Button>
+              </MagneticWrapper>
+
+              <MagneticWrapper>
+                <Button
+                  onClick={handleCopyEmail}
+                  size="lg"
+                  variant="outline"
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 px-6 py-6 rounded-full text-sm font-semibold transition-all hover:scale-105 backdrop-blur-sm cursor-pointer"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4 text-emerald-400" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copy Email
+                    </>
+                  )}
                 </Button>
               </MagneticWrapper>
             </div>
@@ -71,6 +107,16 @@ export default function Contact() {
               >
                 <Linkedin size={18} />
                 <span>LinkedIn</span>
+                <ArrowUpRight size={14} className="opacity-50" />
+              </a>
+              <a
+                href="https://leetcode.com/u/saransh6/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 rounded-full bg-black/10 hover:bg-black/20 text-white transition-colors"
+              >
+                <Code2 size={18} />
+                <span>LeetCode</span>
                 <ArrowUpRight size={14} className="opacity-50" />
               </a>
             </div>
