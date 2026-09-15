@@ -21,8 +21,10 @@ export default function Hero() {
         aria-hidden
         className="absolute inset-0 z-10 pointer-events-none"
       >
-        {/* Dark mode subtle dimming for text contrast (invisible in light mode) */}
-        <div className="absolute inset-0 hidden dark:block bg-black/10" />
+        {/* Soft radial contrast scrim for crisp text legibility */}
+        <div className="absolute inset-0 bg-radial from-white/40 via-transparent to-transparent dark:from-black/60 dark:via-black/25 dark:to-transparent" />
+        {/* Dark mode subtle dimming for text contrast */}
+        <div className="absolute inset-0 hidden dark:block bg-black/15" />
         {/* Universal fade to background to blend into the next section */}
         <div
           className="absolute inset-0"
@@ -54,15 +56,15 @@ export default function Hero() {
         <h1 className="text-6xl md:text-9xl mb-4 leading-tight">
           <Typewriter
             text={"Hey, I’m"}
-            className="inline-block font-serif font-light italic"
+            className="inline-block font-serif font-light italic text-zinc-900 dark:text-zinc-100 drop-shadow-sm"
             speed={150}
           />
           <br />
           <motion.span
-            initial={{ color: "var(--foreground)", textShadow: "0px 0px 0px rgba(99, 102, 241, 0)" }}
-            animate={{ color: "#6366f1", textShadow: "0px 4px 24px rgba(99, 102, 241, 0.5)" }} // indigo-500 with glow
-            transition={{ duration: 1.2, ease: "easeOut", delay: 1 }}
-            className="font-normal font-serif inline-block mt-2"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.0, ease: "easeOut", delay: 0.8 }}
+            className="font-serif font-semibold inline-block mt-2 tracking-tight bg-gradient-to-r from-zinc-950 via-indigo-950 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-indigo-200 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_4px_35px_rgba(99,102,241,0.5)]"
           >
             Saransh Halwai
           </motion.span>
@@ -72,7 +74,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.5 }}
-          className="text-lg md:text-2xl text-zinc-700 dark:text-zinc-100 font-sans max-w-2xl mx-auto mb-10"
+          className="text-lg md:text-2xl text-zinc-800 dark:text-zinc-100 font-sans font-medium max-w-2xl mx-auto mb-10 drop-shadow-sm"
         >
           Full Stack Developer & Systems Enthusiast
         </motion.p>
