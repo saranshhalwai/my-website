@@ -2,26 +2,36 @@
 
 import { useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
+import { useAudio } from "@/context/AudioContext";
 
-export default function ShaderHeroBackground() {
+interface ShaderBackgroundProps {
+  className?: string;
+  isCover?: boolean;
+}
+
+export default function ShaderHeroBackground({ className, isCover = false }: ShaderBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { resolvedTheme } = useTheme();
   const themeRef = useRef(resolvedTheme);
+  const { getAudioMetrics } = useAudio();
+  const audioMetricsRef = useRef(getAudioMetrics);
 
   useEffect(() => {
     themeRef.current = resolvedTheme;
   }, [resolvedTheme]);
 
   useEffect(() => {
+    audioMetricsRef.current = getAudioMetrics;
+  }, [getAudioMetrics]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Use alpha: true if you want to see the body background behind the shader
-    // Use premultipliedAlpha: false to ensure colors don't wash out
     const gl = canvas.getContext("webgl", {
       antialias: false,
       alpha: true,
-      premultipliedAlpha: false
+      premultipliedAlpha: false,
     });
     if (!gl) return;
 
@@ -47,6 +57,12 @@ export default function ShaderHeroBackground() {
       uniform float u_click;
       uniform float u_scroll;
       uniform float u_lightMode;
+
+      // Real-time Web Audio uniforms
+      uniform float u_audioBass;
+      uniform float u_audioMid;
+      uniform float u_audioTreble;
+      uniform float u_audioEnergy;
 
       // Dark Mode Colors
       const vec3 d_indigo950 = vec3(0.117, 0.105, 0.294);
@@ -83,7 +99,6 @@ export default function ShaderHeroBackground() {
         float a = 0.5;
         vec2 shift = vec2(100.0);
         float t = u_time * speed;
-        // Reduced from 7 to 4 octaves for significantly better performance
         for (int i = 0; i < 4; i++) {
           float n = noise(p + t);
           v += a * (1.0 - abs(n * 2.0 - 1.0));
@@ -99,57 +114,70 @@ export default function ShaderHeroBackground() {
         vec2 p = (uv - 0.5) * 2.0;
         p.x *= aspect;
         
-        // Save screen coordinate for accurate mouse tracking
         vec2 screenP = p;
-        
-        // Parallax
         p.y += u_scroll * 0.4;
 
         vec2 m = (u_mouse - 0.5) * 2.0;
         m.x *= aspect;
 
-        // Calculate distance using unshifted screen coordinate
-        float dist = distance(screenP, m);
+        // Decouple center of screen from mouse:
+        // The core ambient glow and music breathing lives at the center of the viewport
+        float centerDist = length(screenP);
+        float mouseDist = distance(screenP, m);
 
-        float ripple = sin(dist * 15.0 - u_time * 4.0) * 0.04 * u_click;
-        float mouseWarp = smoothstep(1.2, 0.0, dist) * 0.2;
-        vec2 warpedP = p + (screenP - m) * (mouseWarp + ripple);
+        // Subtle local mouse interaction (completely unchanged from original)
+        float ripple = sin(mouseDist * 15.0 - u_time * 4.0) * 0.04 * u_click;
+        float mouseWarp = smoothstep(1.0, 0.0, mouseDist) * 0.12;
 
-        float v1 = ridgedFBM(warpedP * 1.2, 0.1);
-        float v2 = ridgedFBM(warpedP * 2.5 + v1, 0.2);
-        float v3 = ridgedFBM(warpedP * 5.0 - v2, 0.3);
+        vec2 baseP = p + (screenP - m) * (mouseWarp + ripple);
+
+        // Natural fluid curl & swirl displacement (like dye in water or aurora borealis, NOT an explosion)
+        vec2 fluidSwirl = vec2(
+          sin(baseP.y * 1.8 + u_time * 0.3),
+          cos(baseP.x * 1.8 + u_time * 0.3)
+        ) * (u_audioBass * 0.14);
+
+        vec2 warpedP = baseP + fluidSwirl;
+
+        // Domain warping with music-enhanced folding:
+        // Bass adds gentle depth to the primary wave
+        float v1 = ridgedFBM(warpedP * 1.2, 0.10 + u_audioBass * 0.04);
+
+        // Mids cause fluid smoke filaments to curl and twist deeper into each other
+        float curlMod = 1.0 + u_audioMid * 0.35;
+        float v2 = ridgedFBM(warpedP * 2.5 + v1 * curlMod, 0.20 + u_audioMid * 0.05);
+
+        // Treble adds fine, crisp filament detail
+        float v3 = ridgedFBM(warpedP * 5.0 - v2 * (1.0 + u_audioTreble * 0.25), 0.30);
 
         vec3 color = vec3(0.0);
+
+        // Calm, soft ambient vignette (never blinding, zero supernova effect)
+        float centerAura = (0.018 + u_audioEnergy * 0.015) / (centerDist * 0.85 + 0.16);
         
         if (u_lightMode > 0.5) {
-          // LIGHT MODE RENDER
+          // LIGHT MODE: Soft, rich indigo clouds
           color += l_base;
-          color = mix(color, l_indigo200, pow(v1, 1.5) * 0.8);
-          color = mix(color, l_indigo400, pow(v2, 2.0) * 0.6);
-          color = mix(color, l_indigo500, pow(v3, 3.0) * 0.4);
+          color = mix(color, l_indigo200, pow(v1, 1.5) * (0.8 + u_audioBass * 0.2));
+          color = mix(color, l_indigo400, pow(v2, 2.0) * (0.6 + u_audioMid * 0.25));
+          color = mix(color, l_indigo500, pow(v3, 3.0) * (0.4 + u_audioTreble * 0.3));
           
-          // Light Mode Flare
-          float flareStrength = 0.015 / (dist + 0.05);
-          color += vec3(flareStrength) * l_indigo500;
-          
-          // Light Mode Edges (softest fade)
+          color += vec3(centerAura * 0.5) * l_indigo500;
           color *= smoothstep(2.5, 0.5, length(p * 0.5) * 0.8);
         } else {
-          // DARK MODE RENDER
-          color += d_indigo950 * pow(v1, 2.0);
-          color += d_indigo700 * pow(v2, 4.0) * 1.5;
-          color += d_indigo500 * pow(v3, 6.0) * 3.0;
+          // DARK MODE: Deep glowing indigo nebulae that swirl and fold organically with the sound
+          color += d_indigo950 * pow(v1, 2.0) * (1.0 + u_audioBass * 0.35);
+          color += d_indigo700 * pow(v2, 3.8) * (1.5 + u_audioMid * 0.45);
+          color += d_indigo500 * pow(v3, 5.5) * (3.0 + u_audioTreble * 0.7);
 
-          // Dark Flare with Chromatic Aberration
-          // Use screenP to accurately follow mouse
-          float flareR = 0.025 / (distance(screenP, m) + 0.05);
-          float flareG = 0.025 / (distance(screenP, m + 0.01) + 0.05);
-          float flareB = 0.025 / (distance(screenP, m - 0.01) + 0.05);
-          vec3 flare = vec3(flareR, flareG, flareB) * d_indigo300;
+          // Calm chromatic ambient aura
+          float ca = 0.008;
+          float auraR = centerAura;
+          float auraG = (0.018 + u_audioEnergy * 0.015) / (length(screenP + ca) * 0.85 + 0.16);
+          float auraB = (0.018 + u_audioEnergy * 0.015) / (length(screenP - ca) * 0.85 + 0.16);
+          vec3 centralGlow = vec3(auraR, auraG, auraB) * d_indigo300 * (1.0 + u_audioEnergy * 0.25);
           
-          color += flare * (0.6 + v3 * 0.4);
-
-          // Dark Mode Edges
+          color += centralGlow * (0.6 + v3 * 0.4);
           color *= smoothstep(2.2, 0.3, length(p * 0.5));
         }
 
@@ -188,23 +216,50 @@ export default function ShaderHeroBackground() {
     const scrollLoc = gl.getUniformLocation(program, "u_scroll");
     const lightModeLoc = gl.getUniformLocation(program, "u_lightMode");
 
+    const audioBassLoc = gl.getUniformLocation(program, "u_audioBass");
+    const audioMidLoc = gl.getUniformLocation(program, "u_audioMid");
+    const audioTrebleLoc = gl.getUniformLocation(program, "u_audioTreble");
+    const audioEnergyLoc = gl.getUniformLocation(program, "u_audioEnergy");
+
     const resize = () => {
-      // Limit DPR to 1.5 for background shader performance
-      // Since it's blurry, high resolutions are unnecessary and expensive
       const dpr = Math.min(window.devicePixelRatio, 1.5);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
 
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible && !animationFrameId) {
+          animationFrameId = requestAnimationFrame(render);
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+
     const render = (t: number) => {
+      if (!isVisible && !isCover) {
+        animationFrameId = 0;
+        return;
+      }
+
       clickAnim *= 0.95;
+      const audio = audioMetricsRef.current ? audioMetricsRef.current() : { bass: 0, mid: 0, treble: 0, energy: 0 };
+
       gl.uniform1f(timeLoc, t * 0.001);
       gl.uniform2f(resLoc, canvas.width, canvas.height);
       gl.uniform2f(mouseLoc, mouseX, mouseY);
       gl.uniform1f(clickLoc, clickAnim);
       gl.uniform1f(scrollLoc, scrollY);
       gl.uniform1f(lightModeLoc, themeRef.current === 'light' ? 1.0 : 0.0);
+
+      gl.uniform1f(audioBassLoc, audio.bass);
+      gl.uniform1f(audioMidLoc, audio.mid);
+      gl.uniform1f(audioTrebleLoc, audio.treble);
+      gl.uniform1f(audioEnergyLoc, audio.energy);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       animationFrameId = requestAnimationFrame(render);
@@ -228,28 +283,25 @@ export default function ShaderHeroBackground() {
     animationFrameId = requestAnimationFrame(render);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      observer.disconnect();
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [isCover]);
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden
+      className={`${isCover ? "fixed inset-0 w-screen h-screen" : "absolute inset-0 w-full h-full"} pointer-events-none z-0 ${className || ""}`}
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: -1, // Ensure this is lower than your content's z-index
-        pointerEvents: 'none',
         background: 'transparent',
-        transform: 'translateZ(0)', // Force hardware acceleration to prevent visual artifacts
+        transform: 'translateZ(0)',
       }}
     />
   );

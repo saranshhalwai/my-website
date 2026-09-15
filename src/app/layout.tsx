@@ -5,6 +5,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
 import CustomCursor from "@/components/CustomCursor";
 import { Toaster } from "@/components/ui/sonner";
+import { AudioProvider } from "@/context/AudioContext";
+import MusicPlayer from "@/components/MusicPlayer";
+import FullscreenVisualizer from "@/components/FullscreenVisualizer";
 
 const notoSerif = Noto_Serif_Display({
   subsets: ["latin"],
@@ -108,10 +111,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CustomCursor />
-          <Navbar />
-          {children}
-          <Toaster />
+          <AudioProvider>
+            <CustomCursor />
+            <Navbar />
+            {children}
+            <MusicPlayer />
+            <FullscreenVisualizer />
+            <Toaster />
+          </AudioProvider>
         </ThemeProvider>
       </body>
     </html>

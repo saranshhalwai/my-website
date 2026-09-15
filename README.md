@@ -8,6 +8,7 @@ Built with **Next.js 16**, **React 19 (TypeScript)**, and **Tailwind CSS v4**.
 
 - **Next.js 16 + React 19 (App Router)**: Fast, server-first modern architecture with dynamic OpenGraph card generation.
 - **Custom WebGL GLSL Shader Hero**: Real-time fragment shader background rendering fluid, interactive light and dark mode visuals with mouse reactivity.
+- **Audio-Reactive Music Player**: Built-in Web Audio API frequency analyser connected live to shader uniforms (bass, mid, treble, energy). Includes tracks from NCS (*Alan Walker - Fade*, *Cartoon & Jéja - On & On*, *Elektronomia - Sky High*) with license attributions, custom audio upload, and full-screen visualizer mode.
 - **Experience & Education Highlights**: Showcase of current studies at IIT Indore and upcoming Developer Internship at Samsung R&D Institute India (SRIB).
 - **Categorized Technical Skills**: Glassmorphic cards for Languages, AI & ML, Systems & Backend, and Cloud & Databases.
 - **Selected Projects**:
