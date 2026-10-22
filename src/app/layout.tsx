@@ -1,33 +1,12 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Mono, Noto_Sans_Display, Noto_Serif_Display } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import Navbar from "@/components/Navbar";
-import CustomCursor from "@/components/CustomCursor";
-import { Toaster } from "@/components/ui/sonner";
-import { AudioProvider } from "@/context/AudioContext";
-import MusicPlayer from "@/components/MusicPlayer";
-import FullscreenVisualizer from "@/components/FullscreenVisualizer";
-
-const notoSerif = Noto_Serif_Display({
-  subsets: ["latin"],
-  variable: "--font-noto-serif",
-});
-
-const notoSans = Noto_Sans_Display({
-  variable: "--font-noto-sans",
-  subsets: ["latin"],
-});
-
-const notoMono = Noto_Sans_Mono({
-  variable: "--font-noto-mono",
-  subsets: ["latin"],
-});
+import MusicExperience from "@/components/MusicExperience";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://saranshhalwai.me"),
   title: "Saransh Halwai | Portfolio & Systems Enthusiast",
-  description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
+  description:
+    "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
   keywords: [
     "Saransh Halwai",
     "Software Developer",
@@ -36,11 +15,12 @@ export const metadata: Metadata = {
     "SRIB",
     "Portfolio",
     "Systems Design",
-    "AI Engineer"
+    "AI Engineer",
   ],
   openGraph: {
     title: "Saransh Halwai | Portfolio",
-    description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
+    description:
+      "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
     url: "https://saranshhalwai.me",
     siteName: "Saransh Halwai",
     locale: "en_US",
@@ -49,7 +29,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Saransh Halwai | Portfolio",
-    description: "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
+    description:
+      "Portfolio of Saransh Halwai. Computer Science & Engineering @ IIT Indore, Incoming Developer Intern @ Samsung R&D (SRIB).",
   },
   robots: {
     index: true,
@@ -94,32 +75,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body
-        className={`${notoSans.variable} ${notoMono.variable} ${notoSerif.variable} antialiased`}
-        suppressHydrationWarning
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AudioProvider>
-            <CustomCursor />
-            <Navbar />
-            {children}
-            <MusicPlayer />
-            <FullscreenVisualizer />
-            <Toaster />
-          </AudioProvider>
-        </ThemeProvider>
+      <body>
+        <MusicExperience>{children}</MusicExperience>
       </body>
     </html>
   );

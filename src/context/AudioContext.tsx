@@ -1,6 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 export interface TrackAttribution {
   song: string;
@@ -60,232 +67,231 @@ export interface AudioMetrics {
   treble: number;
   energy: number;
 }
-
-interface AudioContextType {
+interface AudioState {
   playlist: Track[];
   currentTrack: Track;
   currentTrackIndex: number;
   isPlaying: boolean;
   volume: number;
   isMuted: boolean;
-  isFullscreenVisualizer: boolean;
-  togglePlay: () => void;
+  error: string | null;
+  progress: number;
+  duration: number;
+  visualizerOpen: boolean;
+  togglePlay: () => Promise<void>;
   nextTrack: () => void;
   prevTrack: () => void;
   selectTrack: (index: number) => void;
-  setVolume: (val: number) => void;
+  setVolume: (value: number) => void;
   toggleMute: () => void;
-  toggleFullscreenVisualizer: () => void;
+  seek: (value: number) => void;
+  setVisualizerOpen: (open: boolean) => void;
   loadCustomTrack: (file: File) => void;
   getAudioMetrics: () => AudioMetrics;
 }
+const Context = createContext<AudioState | null>(null);
 
-const AudioVisualizerContext = createContext<AudioContextType | null>(null);
-
-export function AudioProvider({ children }: { children: React.ReactNode }) {
+export function AudioProvider({ children }: { children: ReactNode }) {
   const [playlist, setPlaylist] = useState<Track[]>(PLAYLIST);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [volume, setVolumeState] = useState<number>(0.75);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isFullscreenVisualizer, setIsFullscreenVisualizer] = useState<boolean>(false);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolumeState] = useState(0.65);
+  const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [visualizerOpen, setVisualizerOpen] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const context = useRef<AudioContext | null>(null);
+  const analyser = useRef<AnalyserNode | null>(null);
+  const data = useRef<Uint8Array<ArrayBuffer> | null>(null);
+  const metrics = useRef<AudioMetrics>({
+    bass: 0,
+    mid: 0,
+    treble: 0,
+    energy: 0,
+  });
+  const wantsPlayback = useRef(false);
+  const uploads = useRef<string[]>([]);
+  const currentTrack = playlist[currentTrackIndex];
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  async function prepareAudio() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!context.current && window.AudioContext) {
+      const ctx = new window.AudioContext();
+      const node = ctx.createAnalyser();
+      node.fftSize = 512;
+      node.smoothingTimeConstant = 0.78;
+      ctx.createMediaElementSource(audio).connect(node);
+      node.connect(ctx.destination);
+      context.current = ctx;
+      analyser.current = node;
+      data.current = new Uint8Array(node.frequencyBinCount);
+    }
+    if (context.current?.state === "suspended") await context.current.resume();
+  }
 
-  // Fallback smoothed audio values
-  const currentMetrics = useRef<AudioMetrics>({ bass: 0, mid: 0, treble: 0, energy: 0 });
-
-  const currentTrack = playlist[currentTrackIndex] || playlist[0];
-
-  const initWebAudio = () => {
-    if (audioContextRef.current || !audioRef.current) return;
-
+  async function play() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    setError(null);
+    wantsPlayback.current = true;
     try {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ctx = new AudioContextClass();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.8;
-
-      const source = ctx.createMediaElementSource(audioRef.current);
-      source.connect(analyser);
-      analyser.connect(ctx.destination);
-
-      audioContextRef.current = ctx;
-      analyserRef.current = analyser;
-      sourceNodeRef.current = source;
+      await prepareAudio();
+      await audio.play();
     } catch (err) {
-      console.warn("Web Audio API initialization failed:", err);
-    }
-  };
-
-  const togglePlay = async () => {
-    if (!audioRef.current) return;
-
-    initWebAudio();
-
-    if (audioContextRef.current?.state === "suspended") {
-      await audioContextRef.current.resume();
-    }
-
-    if (isPlaying) {
-      audioRef.current.pause();
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      wantsPlayback.current = false;
       setIsPlaying(false);
-    } else {
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (err) {
-        console.error("Playback error:", err);
-      }
+      setError(
+        "Couldn’t play this track. Try another track or upload your own.",
+      );
     }
-  };
+  }
 
-  const playTrackAtIndex = async (index: number) => {
-    initWebAudio();
-    if (audioContextRef.current?.state === "suspended") {
-      await audioContextRef.current.resume().catch(() => {});
-    }
-    setCurrentTrackIndex(index);
-    setIsPlaying(true);
-  };
-
-  const nextTrack = () => {
-    const nextIdx = (currentTrackIndex + 1) % playlist.length;
-    playTrackAtIndex(nextIdx);
-  };
-
-  const prevTrack = () => {
-    const prevIdx = (currentTrackIndex - 1 + playlist.length) % playlist.length;
-    playTrackAtIndex(prevIdx);
-  };
-
-  const selectTrack = (index: number) => {
-    if (index >= 0 && index < playlist.length) {
-      playTrackAtIndex(index);
-    }
-  };
-
-  const setVolume = (val: number) => {
-    const clamped = Math.max(0, Math.min(1, val));
-    setVolumeState(clamped);
-    if (audioRef.current) {
-      audioRef.current.volume = clamped;
-    }
-    if (clamped > 0 && isMuted) {
-      setIsMuted(false);
-    }
-  };
-
-  const toggleMute = () => {
+  async function togglePlay() {
     if (!audioRef.current) return;
-    if (isMuted) {
-      audioRef.current.volume = volume;
-      setIsMuted(false);
+    if (!audioRef.current.paused) {
+      wantsPlayback.current = false;
+      audioRef.current.pause();
+    } else await play();
+  }
+
+  function selectTrack(index: number) {
+    if (index < 0 || index >= playlist.length) return;
+    if (index === currentTrackIndex) {
+      if (audioRef.current) audioRef.current.currentTime = 0;
+      void play();
     } else {
-      audioRef.current.volume = 0;
-      setIsMuted(true);
+      // Resume the context in the same user gesture, including on mobile Safari.
+      void prepareAudio().catch(() => {});
+      wantsPlayback.current = true;
+      setCurrentTrackIndex(index);
     }
-  };
-
-  const toggleFullscreenVisualizer = () => {
-    setIsFullscreenVisualizer((prev) => !prev);
-  };
-
-  const loadCustomTrack = (file: File) => {
+  }
+  function nextTrack() {
+    selectTrack((currentTrackIndex + 1) % playlist.length);
+  }
+  function prevTrack() {
+    selectTrack((currentTrackIndex - 1 + playlist.length) % playlist.length);
+  }
+  function setVolume(value: number) {
+    const next = Math.max(0, Math.min(1, value));
+    setVolumeState(next);
+    if (next > 0) setIsMuted(false);
+  }
+  function seek(value: number) {
+    if (audioRef.current && Number.isFinite(duration) && duration > 0) {
+      audioRef.current.currentTime = Math.max(0, Math.min(duration, value));
+      setProgress(audioRef.current.currentTime);
+    }
+  }
+  function loadCustomTrack(file: File) {
+    if (
+      !file.type.startsWith("audio/") &&
+      !/\.(mp3|wav|ogg|m4a|flac|aac)$/i.test(file.name)
+    ) {
+      setError("Choose an audio file.");
+      return;
+    }
     const url = URL.createObjectURL(file);
-    const newTrack: Track = {
-      id: `custom-${Date.now()}`,
-      title: file.name.replace(/\.[^/.]+$/, ""),
-      artist: "Local Upload",
-      src: url,
-      attribution: {
-        song: file.name,
-        provider: "Uploaded by User",
+    uploads.current.push(url);
+    void prepareAudio().catch(() => {});
+    setPlaylist([
+      ...playlist,
+      {
+        id: `upload-${uploads.current.length}`,
+        title: file.name.replace(/\.[^.]+$/, ""),
+        artist: "Local Upload",
+        src: url,
+        attribution: { song: file.name, provider: "Uploaded by User" },
       },
-    };
-    setPlaylist((prev) => [newTrack, ...prev]);
-    setCurrentTrackIndex(0);
-    setIsPlaying(true);
-  };
+    ]);
+    wantsPlayback.current = true;
+    setCurrentTrackIndex(playlist.length);
+  }
 
-  // Sync volume and src when currentTrack changes
   useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.src = currentTrack.src;
-    audioRef.current.volume = isMuted ? 0 : volume;
-    if (isPlaying) {
-      audioRef.current.play().catch(() => setIsPlaying(false));
-    }
-  }, [currentTrackIndex, currentTrack.src, isPlaying, isMuted, volume]);
-
-  // Audio metrics extraction loop
-  const getAudioMetrics = (): AudioMetrics => {
-    const analyser = analyserRef.current;
-    if (!analyser || !isPlaying) {
-      // Smoothly decay to 0
-      currentMetrics.current.bass *= 0.85;
-      currentMetrics.current.mid *= 0.85;
-      currentMetrics.current.treble *= 0.85;
-      currentMetrics.current.energy *= 0.85;
-      return currentMetrics.current;
-    }
-
-    const freqData = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(freqData);
-
-    // Bass: bins 1 to 6 (~20Hz to ~250Hz)
-    let bassSum = 0;
-    const bassCount = 6;
-    for (let i = 1; i <= bassCount; i++) {
-      bassSum += freqData[i];
-    }
-    const rawBass = Math.min(1.0, (bassSum / (bassCount * 255)) * 1.4);
-
-    // Mid: bins 7 to 28 (~250Hz to ~2500Hz)
-    let midSum = 0;
-    const midCount = 22;
-    for (let i = 7; i < 7 + midCount; i++) {
-      midSum += freqData[i];
-    }
-    const rawMid = Math.min(1.0, (midSum / (midCount * 255)) * 1.6);
-
-    // Treble: bins 29 to 75 (~2500Hz to ~10000Hz)
-    let trebleSum = 0;
-    const trebleCount = 47;
-    for (let i = 29; i < 29 + trebleCount; i++) {
-      trebleSum += freqData[i];
-    }
-    const rawTreble = Math.min(1.0, (trebleSum / (trebleCount * 255)) * 1.8);
-
-    // Total Energy
-    let totalSum = 0;
-    for (let i = 0; i < freqData.length; i++) {
-      totalSum += freqData[i];
-    }
-    const rawEnergy = Math.min(1.0, (totalSum / (freqData.length * 255)) * 1.5);
-
-    // Refined, natural attack/decay smoothing
-    const smooth = (curr: number, target: number) => {
-      const factor = target > curr ? 0.24 : 0.08;
-      return curr + (target - curr) * factor;
+    const audio = audioRef.current;
+    if (!audio) return;
+    let active = true;
+    audio.src = currentTrack.src;
+    audio.load();
+    const start = async () => {
+      if (!wantsPlayback.current) return;
+      try {
+        await audio.play();
+      } catch (err) {
+        if (
+          !active ||
+          (err instanceof DOMException && err.name === "AbortError")
+        )
+          return;
+        wantsPlayback.current = false;
+        setIsPlaying(false);
+        setError(
+          "Couldn’t play this track. Try another track or upload your own.",
+        );
+      }
     };
-
-    currentMetrics.current = {
-      bass: smooth(currentMetrics.current.bass, rawBass),
-      mid: smooth(currentMetrics.current.mid, rawMid),
-      treble: smooth(currentMetrics.current.treble, rawTreble),
-      energy: smooth(currentMetrics.current.energy, rawEnergy),
+    void start();
+    return () => {
+      active = false;
     };
+  }, [currentTrack.src]);
 
-    return currentMetrics.current;
-  };
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+      audioRef.current.muted = isMuted;
+    }
+  }, [volume, isMuted]);
+  useEffect(
+    () => () => {
+      uploads.current.forEach((url) => URL.revokeObjectURL(url));
+      void context.current?.close();
+    },
+    [],
+  );
+
+  function getAudioMetrics() {
+    const node = analyser.current;
+    const bins = data.current;
+    const audio = audioRef.current;
+    if (!node || !bins || !audio || audio.paused) {
+      for (const key of ["bass", "mid", "treble", "energy"] as const)
+        metrics.current[key] *= 0.88;
+      return metrics.current;
+    }
+    node.getByteFrequencyData(bins);
+    const average = (from: number, to: number) => {
+      let total = 0;
+      for (let i = from; i < to; i++) total += bins[i];
+      return Math.min(1, (total / ((to - from) * 255)) * 1.65);
+    };
+    // Derive bands from sample rate rather than assuming fixed FFT-bin frequencies.
+    const binHz = (context.current?.sampleRate ?? 48000) / node.fftSize;
+    const cutoff = (hz: number) =>
+      Math.max(1, Math.min(bins.length, Math.round(hz / binHz)));
+    const bassEnd = Math.max(2, cutoff(250));
+    const midEnd = Math.max(bassEnd + 1, cutoff(2500));
+    const trebleEnd = Math.max(midEnd + 1, cutoff(10000));
+    const target = {
+      bass: average(1, bassEnd),
+      mid: average(bassEnd, midEnd),
+      treble: average(midEnd, trebleEnd),
+      energy: average(1, bins.length),
+    };
+    for (const key of ["bass", "mid", "treble", "energy"] as const) {
+      const speed = target[key] > metrics.current[key] ? 0.3 : 0.09;
+      metrics.current[key] += (target[key] - metrics.current[key]) * speed;
+    }
+    return metrics.current;
+  }
 
   return (
-    <AudioVisualizerContext.Provider
+    <Context.Provider
       value={{
         playlist,
         currentTrack,
@@ -293,33 +299,53 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isPlaying,
         volume,
         isMuted,
-        isFullscreenVisualizer,
+        error,
+        progress,
+        duration,
+        visualizerOpen,
         togglePlay,
         nextTrack,
         prevTrack,
         selectTrack,
         setVolume,
-        toggleMute,
-        toggleFullscreenVisualizer,
+        toggleMute: () => setIsMuted((value) => !value),
+        seek,
+        setVisualizerOpen,
         loadCustomTrack,
         getAudioMetrics,
       }}
     >
       <audio
         ref={audioRef}
-        crossOrigin="anonymous"
+        preload="none"
+        onPlay={() => {
+          setIsPlaying(true);
+          setError(null);
+        }}
+        onPause={() => setIsPlaying(false)}
+        onTimeUpdate={() => setProgress(audioRef.current?.currentTime ?? 0)}
+        onLoadedMetadata={() => {
+          setDuration(
+            Number.isFinite(audioRef.current?.duration)
+              ? audioRef.current!.duration
+              : 0,
+          );
+          setProgress(0);
+        }}
         onEnded={nextTrack}
-        preload="metadata"
+        onError={() => {
+          setIsPlaying(false);
+          setError(
+            "This track couldn’t load. Try another track or upload your own.",
+          );
+        }}
       />
       {children}
-    </AudioVisualizerContext.Provider>
+    </Context.Provider>
   );
 }
-
 export function useAudio() {
-  const ctx = useContext(AudioVisualizerContext);
-  if (!ctx) {
-    throw new Error("useAudio must be used within an AudioProvider");
-  }
-  return ctx;
+  const value = useContext(Context);
+  if (!value) throw new Error("useAudio requires AudioProvider");
+  return value;
 }
